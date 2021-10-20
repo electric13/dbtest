@@ -5,14 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Material extends Model
+class OrderLine extends Model
 {
     use HasFactory;
 
     public $timestamps = false;
 
-    protected $fillable = [
-        'material', 'thickness','color', 'actual'
-    ];
-
+    public function material()
+    {
+        return $this->belongsTo(Material::class);
+    }
 }

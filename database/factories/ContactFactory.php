@@ -19,21 +19,18 @@ class ContactFactory extends Factory
      *
      * @return array
      */
-    public function definition()
-    {
+    public function definition() {
+	    $faker = \Faker\Factory::create();
+	    // generate 3 random colors
+	    $colors = collect(range(1, 3))->map(function() use ($faker) {
+	        return $faker->colorName;
+	    })->toArray();
 
-	$faker = \Faker\Factory::create();
-	// generate 3 random colors
-
-	$colors = collect(range(1, 3))->map(function() use ($faker) {
-	    return $faker->colorName;
-	})->toArray();
-	
-	return [
-	    'name' => $faker->name,
-	    'phone' => $faker->e164PhoneNumber,
-	    'address' => $faker->address,
-	    'favorites' => ['colors' => $colors],
-	];
+	    return [
+	        'name' => $faker->name,
+	        'phone' => $faker->e164PhoneNumber,
+	        'address' => $faker->address,
+	        'favorites' => ['colors' => $colors],
+	    ];
     }
 }

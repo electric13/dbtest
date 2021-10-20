@@ -2,17 +2,17 @@
 
 namespace Database\Factories;
 
-use App\Models\Material;
+use App\Models\OrderLine;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class MaterialFactory extends Factory
+class OrderLineFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
      *
      * @var string
      */
-    protected $model = Material::class;
+    protected $model = OrderLine::class;
 
     /**
      * Define the model's default state.
@@ -22,10 +22,12 @@ class MaterialFactory extends Factory
     public function definition()
     {
         return [
-            'material' => '',
-            'thickness' => 0.45,
-            'color' => '#000000',
-            'actual' => true
+            'order_id' => 1,
+            'material_id' => 1,
+            'product_id' => 1,
+            'item_id' => 0,
+            'length' => 1000,
+            'amount' => 1
         ];
     }
 }
