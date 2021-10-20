@@ -12,7 +12,7 @@ class Material extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'material', 'thickness','color', 'actual'
+        'material', 'thickness','color', 'actual', 'mtype'
     ];
 
 }

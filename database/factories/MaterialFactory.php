@@ -25,6 +25,7 @@ class MaterialFactory extends Factory
             'material' => '',
             'thickness' => 0.45,
             'color' => '#000000',
+            'mtype' => 1,
             'actual' => true
         ];
     }

@@ -14,6 +14,6 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    $contacts = App\Models\Contact::all();
-    return view('welcome', ['contacts'=> $contacts]);
+    //$contacts = App\Models\Contact::all();
+    return view('welcome'); //, ['contacts'=> $contacts]);
 });

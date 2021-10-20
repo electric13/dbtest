@@ -18,6 +18,7 @@ class CreateMaterialsTable extends Migration
             $table->string('material');
             $table->decimal('thickness', 3,2);
             $table->string('color');
+            $table->integer('mtype');
             $table->boolean('actual');
         });
     }
