@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
+use \App\Http\Controllers\MainController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -13,7 +13,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::get('/order/{id}', [MainController::class, 'order']);
+
 Route::get('/', function () {
-    //$contacts = App\Models\Contact::all();
     return view('welcome'); //, ['contacts'=> $contacts]);
 });

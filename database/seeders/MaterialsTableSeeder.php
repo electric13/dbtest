@@ -17,15 +17,18 @@ class MaterialsTableSeeder extends Seeder
         if (! Material::count()) { $this->addMaterials(); }
     }
 
-    static materials = [
-        ['material' => 'Цинк', 'thickness' => 0.35, 'color' => '#000000', 'actual' => true, 'type' => 1 ],
-        ['material' => 'Цинк', 'thickness' => 0.4,  'color' => '#000000', 'actual' => true, 'type' => 1  ],
-        ['material' => 'Цинк', 'thickness' => 0.45, 'color' => '#000000', 'actual' => true, 'type' => 1  ],
-        ['material' => 'RAL8017', 'thickness' => 0.35, 'color' => '#000000', 'actual' => true, 'type' => 2  ],
-        ['material' => 'RAL8017', 'thickness' => 0.4, 'color' => '#000000', 'actual' => true, 'type' => 2  ],
-        ['material' => 'RAL8017', 'thickness' => 0.45, 'color' => '#000000', 'actual' => true, 'type' => 2  ]
-    ]
 
     public function addMaterials(){
+        $mdescrs = [
+            ['material' => 'Цинк', 'thickness' => 0.35, 'color' => '#000000', 'actual' => true, 'mtype' => 1 ],
+            ['material' => 'Цинк', 'thickness' => 0.4,  'color' => '#000000', 'actual' => true, 'mtype' => 1  ],
+            ['material' => 'Цинк', 'thickness' => 0.45, 'color' => '#000000', 'actual' => true, 'mtype' => 1  ],
+            ['material' => 'RAL8017', 'thickness' => 0.35, 'color' => '#000000', 'actual' => true, 'mtype' => 2  ],
+            ['material' => 'RAL8017', 'thickness' => 0.4, 'color' => '#000000', 'actual' => true, 'mtype' => 2  ],
+            ['material' => 'RAL8017', 'thickness' => 0.45, 'color' => '#000000', 'actual' => true, 'mtype' => 2  ]
+        ];
+        foreach ($mdescrs as $mdesc) {
+            $mat = Material::create($mdesc);
+        }
     }
 }
