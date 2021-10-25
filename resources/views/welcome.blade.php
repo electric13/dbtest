@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Contacts</title>
+<title>DB Test</title>
 <link rel="stylesheet" href="https://unpkg.com/tachyons@4.10.0/css/tachyons.min.css"/>
 </head>
 <body>
 <div class="mw6 center pa3 sans-serif">
-<h1 class="mb4">Contacts</h1>
+<h1 class="mb4">DB Test</h1>
 @foreach($ols as $orderline)
 <div class="pa2 mb3 striped--near-white">
 <header class="b mb2">{{ $orderline->product()->get()[0]->product }}</header>

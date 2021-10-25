@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use \App\Http\Controllers\MainController;
+use \App\Http\Controllers\AddItemController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -13,7 +14,11 @@ use \App\Http\Controllers\MainController;
 |
 */
 
-Route::get('/order/{id}', [MainController::class, 'order']);
+Route::get('/order/{id}',  [MainController::class, 'order']);
+
+Route::get('/basket',       [MainController::class, 'showBasket']);
+Route::get('/basket/add',   [AddItemController::class, 'add']);
+Route::get('/basket/clear', [AddItemController::class, 'clear']);
 
 Route::get('/', function () {
     return view('welcome'); //, ['contacts'=> $contacts]);
