@@ -15,6 +15,10 @@ class MainController extends Controller
         return view('welcome', [ 'ols' => $ols ]);
     }
 
+    public function vueTest(Request $request) {
+        return view('vue');
+    }
+
     public function showBasket(Request $request){
 
         $bsk_coll = Basket::where('session_id', $request->session()->getId());

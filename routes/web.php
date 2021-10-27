@@ -15,10 +15,12 @@ use \App\Http\Controllers\AddItemController;
 */
 
 Route::get('/order/{id}',  [MainController::class, 'order']);
+Route::get('/vue',  [MainController::class, 'vueTest']);
 
 Route::get('/basket',       [MainController::class, 'showBasket']);
 Route::get('/basket/add',   [AddItemController::class, 'add']);
 Route::get('/basket/clear', [AddItemController::class, 'clear']);
+Route::post('/basket/del',  [AddItemController::class, 'delete']);
 
 Route::get('/', function () {
     return view('welcome'); //, ['contacts'=> $contacts]);

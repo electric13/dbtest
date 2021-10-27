@@ -28,6 +28,18 @@ class AddItemController extends Controller
         );
     }
 
+    public function delete(Request $request){
+        // получаем идентификатор корзины, привязанный к сессии
+        $basket_id = Basket::where('session_id', $request->session()->getId());
+        // если корзина имеется, то...
+        if ( isset($basket_id->first()->id)) {
+            // удаляем элемент с привязкой к корзине, чтобы не удалить чужое!
+            $items = BasketItem::where('basket_id', $basket_id->first()->id)
+                               ->where('id', (int)$_POST['bi_id'])
+                               ->delete();
+        }
+    }
+
     public function clear(Request $request){
         $bsk_coll = Basket::where('session_id', $request->session()->getId());
         if ( isset($bsk_coll->first()->id)) {
