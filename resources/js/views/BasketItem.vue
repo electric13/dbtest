@@ -1,5 +1,5 @@
 <template>
-    <div class="basket-iten">
+    <div class="basket-item">
         <div class="panel panel-default">
             <h3>{{ b_item }}</h3><br>
             Код строки: {{ id }}<br>

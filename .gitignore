@@ -3,8 +3,14 @@
 /public/storage
 /storage/*.key
 /vendor
+gitpush.sh
+.editorconfig
+.gitignore
 .env
 .env.backup
+.env.example
+.styleci.yml
+artisan
 .phpunit.result.cache
 docker-compose.override.yml
 Homestead.json
