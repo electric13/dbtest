@@ -1,5 +1,6 @@
 require('./bootstrap');
 require('./demo');
+require('./basket');
 
 import Vue from 'vue'
 

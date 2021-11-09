@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\BasketItemCollection;
 use App\Models\Basket;
 use App\Models\BasketItem;
 use Illuminate\Http\Request;
@@ -48,4 +49,25 @@ class AddItemController extends Controller
             Basket::destroy($bsk_id);
         }
     }
+
+    public function apiClear(Request $request){
+        $bsk_coll = Basket::where('session_id', $request->session()->getId());
+        if ( isset($bsk_coll->first()->id)) {
+            $bsk_id = $bsk_coll->first()->id;
+            BasketItem::where('basket_id', $bsk_id)->delete();
+            Basket::destroy($bsk_id);
+        }
+        return new BasketItemCollection(null);
+    }
+
+    public function apiIndex(Request $request){
+        $bsk_coll = Basket::where('session_id', $request->session()->getId());
+        if (!isset($bsk_coll->first()->id)) {
+            $bi = null;
+        } else {
+            $bi = BasketItem::where('basket_id', $bsk_coll->first()->id)->get();
+        }
+        return new BasketItemCollection($bi);
+    }
+
 }

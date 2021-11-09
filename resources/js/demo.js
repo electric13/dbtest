@@ -28,3 +28,29 @@ function killBtnListener(event) {
 [...document.querySelectorAll('.killBtn')].forEach(item => {
   item.addEventListener('click', killBtnListener);
 });
+
+function ProductItem(id, product) {
+    this.id = id;
+    this.product = product;
+}
+
+function MaterialItem(id, material) {
+    this.id = id;
+    this.material = material;
+}
+
+window.getProductsList = function(){
+    return [
+	new ProductItem(1, 'Профлист'),
+	new ProductItem(2, 'Металлочерепица'),
+	new ProductItem(3, 'Гладкий лист')    
+    ];
+};
+
+window.getMaterialsList = function(){
+    return [
+	new MaterialItem(1, 'Цинк'),
+	new MaterialItem(2, 'RAL8017'),
+	new MaterialItem(3, 'RAL9003')    
+    ];
+};
