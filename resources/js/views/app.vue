@@ -15,22 +15,14 @@
 import BasketItem from "./BasketItem";
 import axios from "axios";
 
-function BaskItem(id, material, product, amount, length, price) {
-    this.id = id;
-    this.material = material;
-    this.product = product;
-    this.amount = amount;
-    this.length = length;
-    this.price = price;
-}
-
-function i_helper(id, m_id, p_id, amnt, lng, prc){
+function BaskItem(parent, id, m_id, p_id, amount, length, price) {
+    this.parent = parent;
     this.id = id;
     this.m_id = m_id;
     this.p_id = p_id;
-    this.amnt = amnt;
-    this.lng = lng;
-    this.prc = prc;
+    this.amount = amount;
+    this.length = length;
+    this.price = price;
 }
 
 const default_layout = "default";
@@ -41,63 +33,66 @@ export default {
       return {
           items: [],
           materials: [],
-          product: []
+          products: [],
       }
   },
   methods: {
-    async create() {
-              // To do
-    },
-    async read() {
-        //const { data } = window.axios.get('/api/cruds');
-        //data.forEach(crud => this.cruds.push(new Crud(crud)));
+      async create() {
+          // To do
+      },
+      async read() {
+          let promises = [], tmp = [];
+          //загружаем справочник материалов
+          if (this.materials.length == 0) {
+              promises.push(axios.get('/api/materials').then(response => {
+                  this.materials = response.data.data;
+              }));
+          };
+          //и справочник продукции
+          if (this.products.length == 0) {
+              promises.push(axios.get('/api/products').then(response => {
+                  this.products = response.data.data;
+              }));
+          }
+          promises.push(axios.get('/api/basket')
+               .then(response => {
+                   tmp = response.data.data;
+               }));
 
-        let tmp = [
-    	    new i_helper(7,1,1,5, 1000, 10.0),
-    	    new i_helper(8,2,2,3, 2000, 15.0),
-    	    new i_helper(6,3,1,3, 2500, 17.0),
-    	    new i_helper(9,3,3,6, 3000, 20.0)
-        ];
+          Promise.all(promises).then(responses => {
+              for (let i of tmp) {
+                  this.items.push(new BaskItem(this, i.id,
+                                                     i.material_id,
+                                                     i.product_id,
+                                                     i.amount,
+                                                     i.length,
+                                                     0))
+              }
+          });
+      },
+      async update() {
+      },
 
-	let prods = getProductsList();
-	let mats = getMaterialsList();
+      async addItem() {
+          this.items.push(new BaskItem(this, 10, 6, 5, 7, 1440, 23.0));
+      },
 
-	for (let i of tmp){
-	    let prod = "";
-	    let id = prods.findIndex(x => x.id === i.p_id);
-	    if (typeof id != "undefined") { prod = prods[id].product; }
-	    let mat = "";
-	    id = mats.findIndex(x => x.id === i.m_id);
-	    if (typeof id != "undefined") { mat = mats[id].material; }
-	    this.items.push(new BaskItem(i.id, mat, prod, i.amnt, i.lng, i.prc));
-	}
-//        this.items.push(new BaskItem(7, 1, 1, 5, 1000, 10.0));
-    },
-    async update(id, color) {
-    },
-
-    async addItem() {
-        this.items.push(new BaskItem(10,'RAL9999', 'Миталл', 7, 1440, 23.0));
-    },
-
-    async delItem(id) {
-       this.items.splice(0,1);
-    }
+      async delItem(id) {
+          let f_id = this.items.findIndex(x => x.id === id);
+          if (f_id >= 0) {
+/*              axios.get('/api/basket')
+                    .then(response => {
+                      tmp = response.data.data;
+                  })*/
+              const res = await axios.post('/basket/del', 'bi_id='+id);
+              this.items.splice(f_id, 1);
+          }
+      },
   },
   components: {
     BasketItem
   },
   created() {
-     axios.get('/api/materials').then(response => {
-         this.materials = response.data.data;
-         console.log(this.materials);
-     });
-     axios.get('/api/products').then(response => {
-         this.products = response.data.data;
-         console.log(this.products);
-     });
-     //data.forEach(crud => this.cruds.push(new Crud(crud)));
-
     this.read();
   }
 };

@@ -2,11 +2,9 @@ import axios from "axios";
 
 async function fetchMaterials() {
     try {
-	const url = "/api/materials";
+	    const url = "/api/materials";
         const response = await axios.get(url);
         const results = response.data;
-	    console.log('Ok');
-        console.log(results.data);
     } catch (err) {
         if (err.response) {
           // client received an error response (5xx, 4xx)
@@ -19,5 +17,3 @@ async function fetchMaterials() {
         }
     }
 }
-
-//fetchMaterials();

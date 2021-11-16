@@ -7,7 +7,7 @@ function callDelReq(bi_id) {
         xhr.setRequestHeader("X-CSRF-TOKEN", document.querySelector('meta[name="csrf-token"]').content);
         xhr.send(pData);
         xhr.onload = function() {
-            if (xhr.status != 200) { 
+            if (xhr.status != 200) {
                 console.log(`Ошибка ${xhr.status}: ${xhr.statusText}`); // Например, 404: Not Found
             } else { // если всё прошло гладко, выводим результат
                 console.log(`Готово, получили ${xhr.response.length} байт`); // response -- это ответ сервера
@@ -28,29 +28,3 @@ function killBtnListener(event) {
 [...document.querySelectorAll('.killBtn')].forEach(item => {
   item.addEventListener('click', killBtnListener);
 });
-
-function ProductItem(id, product) {
-    this.id = id;
-    this.product = product;
-}
-
-function MaterialItem(id, material) {
-    this.id = id;
-    this.material = material;
-}
-
-window.getProductsList = function(){
-    return [
-	new ProductItem(1, 'Профлист'),
-	new ProductItem(2, 'Металлочерепица'),
-	new ProductItem(3, 'Гладкий лист')    
-    ];
-};
-
-window.getMaterialsList = function(){
-    return [
-	new MaterialItem(1, 'Цинк'),
-	new MaterialItem(2, 'RAL8017'),
-	new MaterialItem(3, 'RAL9003')    
-    ];
-};

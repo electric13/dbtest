@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\BasketItemCollection;
 use App\Http\Resources\MaterialCollection;
 use App\Http\Resources\ProductCollection;
 use App\Models\Material;
@@ -17,6 +18,5 @@ class APIRefDataController extends Controller
     public function apiProdIndex(Request $request){
         return new ProductCollection(Product::all());
     }
-
 
 }
