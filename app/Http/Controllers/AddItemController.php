@@ -6,6 +6,8 @@ use App\Http\Resources\BasketItemCollection;
 use App\Models\Basket;
 use App\Models\BasketItem;
 use Illuminate\Http\Request;
+use App\Http\Requests\BasketItemRequest;
+use function PHPUnit\Framework\returnArgument;
 
 class AddItemController extends Controller
 {
@@ -50,7 +52,7 @@ class AddItemController extends Controller
         }
     }
 
-    public function apiClear(Request $request){
+    public function apiClear(BasketItemRequest $request){
         $bsk_coll = Basket::where('session_id', $request->session()->getId());
         if ( isset($bsk_coll->first()->id)) {
             $bsk_id = $bsk_coll->first()->id;
@@ -60,10 +62,11 @@ class AddItemController extends Controller
         return new BasketItemCollection(null);
     }
 
-    public function apiIndex(Request $request){
-        $bsk_coll = Basket::where('session_id', $request->session()->getId());
+    public function apiIndex(BasketItemRequest $request){
+        $session_id = $request->request->get('key');
+        $bsk_coll = Basket::where('session_id', $session_id);
         if (!isset($bsk_coll->first()->id)) {
-            $bi = null;
+            return ['noBasketYet' => true];
         } else {
             $bi = BasketItem::where('basket_id', $bsk_coll->first()->id)->get();
         }
