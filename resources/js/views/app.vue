@@ -1,11 +1,23 @@
 <template>
   <div>
-    <basket-item
-          v-for="item in items"
-          v-bind="item"
-          :key="item.id"
-          @del-item="delItem"
-     />
+    <table>
+        <tr>
+            <th>Код стр.</th>
+            <th>Наименование</th>
+            <th>Длина</th>
+            <th>Кол-во</th>
+            <th>Удалить</th>
+            <th>Дополнительно</th>
+        </tr>
+        <basket-item
+            v-for="item in items"
+            v-bind="item"
+            :key="item.id"
+            @del-item="delItem"
+        />
+
+    </table>
+     <br>BasketID={{ basketID }}<br>
      <button @click="addItem">Добавить</button>
   </div>
 </template>
@@ -34,6 +46,9 @@ export default {
           items: [],
           materials: [],
           products: [],
+          linksMT: [],       //соответствие толщин материалам
+          linksTM: [],       //соответствие материалов толщинам
+          basketID: ''
       }
   },
   methods: {
@@ -46,24 +61,49 @@ export default {
           if (this.materials.length == 0) {
               promises.push(axios.get('/api/materials').then(response => {
                   this.materials = response.data.data;
+                  // получаем список материалов
+                  let t = [... new Set( Array.from(this.materials, ({material}) => material))];
+                  //получаем набор доступных толщин для каждого материала
+                  let obj = this;
+                  this.linksMT = t.map( function (m) {
+                      let thicknesses = this.materials.filter( function (material) {
+                          return this == material.material;
+                      }, m);
+                      return {
+                          "m": m,
+                          "t": thicknesses
+                      };
+                  }, obj);
               }));
-          };
+          }
+
           //и справочник продукции
           if (this.products.length == 0) {
               promises.push(axios.get('/api/products').then(response => {
                   this.products = response.data.data;
               }));
           }
-          promises.push(axios.get('/api/basket')
-               .then(response => {
-                   tmp = response.data.data;
-               }));
 
-          Promise.all(promises).then(responses => {
+          if ( localStorage.getItem('session_id') == null) {
+              promises.push(axios.get('/api/register').then(response => {
+                  this.basketID = response.data.key;
+                  localStorage.setItem('session_id', this.basketID);
+              }));
+          } else {
+              this.basketID = localStorage.getItem('session_id');
+              let req = { "key": this.basketID }
+              promises.push(axios.post('/api/basket', req, {})
+                  .then(response => {
+                      tmp = response.data.data;
+                  }));
+          }
+
+
+          Promise.all(promises).then( () => {
               for (let i of tmp) {
                   this.items.push(new BaskItem(this, i.id,
-                                                     i.material_id,
-                                                     i.product_id,
+                                                     i.material,
+                                                     i.product,
                                                      i.amount,
                                                      i.length,
                                                      0))
@@ -80,12 +120,10 @@ export default {
       async delItem(id) {
           let f_id = this.items.findIndex(x => x.id === id);
           if (f_id >= 0) {
-/*              axios.get('/api/basket')
-                    .then(response => {
-                      tmp = response.data.data;
-                  })*/
-              const res = await axios.post('/basket/del', 'bi_id='+id);
-              this.items.splice(f_id, 1);
+              let req = { "key": this.basketID, "id": id }
+              axios.post('/api/basket/del', req, {})
+                   .then(() => { this.items.splice(f_id, 1); })
+                   .catch(err => alert(err));
           }
       },
   },
