@@ -11,7 +11,7 @@
                 >{{ mat.m }}
                 </option>
             </select>&nbsp;
-            <select v-bind="tList" v-model="material_id" v-on:change="changeMaterial(id)">
+            <select v-bind="tList" v-model="material_id" v-on:change="changeThickness(id)">
                 <option
                     v-for="thc in tList"
                     :value="thc.id"
@@ -38,7 +38,34 @@ export default {
             this.$emit('del-item', this.id);
         },
 
-        changeMaterial(id) {
+        postData() {
+            let req = {
+                        "key": this.parent.basketID,
+                        "id": this.id,
+                        "material": this.material_id,
+                        "product": this.p_id,
+                        "amount": this.amount,
+                        "item": this.i_id,
+                        "length": this.length
+                      }
+            console.log('update line '+this.id);
+            console.log(req);
+            axios.post('/api/basket/update', req, {})
+                    .then(() => { this.$emit('upd-item', this.id); })
+                    .catch(() => { this.$emit('upd-item', this.id); });
+        },
+
+        changeThickness() {
+            let idx = this.tList.findIndex(x => x.id === this.material_id);
+            if (idx >= 0) {
+                this.sThickness = this.tList[idx].thickness;
+            } else {
+                this.sThickness = 0;
+            }
+            this.postData();
+        },
+
+        changeMaterial() {
             this.tList = this.thicknessList(this.sMaterial);
             let idx = this.tList.findIndex(x => x.thickness === this.sThickness);
             if (idx >= 0) {
@@ -49,6 +76,7 @@ export default {
                 this.material_id = this.tList[0].id;
                 this.sThickness =  this.tList[0].thickness;
             }
+            this.postData();
         },
 
         //Возвращает наименование материала в текстовом виде
@@ -86,6 +114,7 @@ export default {
         'id',
         'm_id',
         'p_id',
+        'i_id',
         'length',
         'amount',
         'price'

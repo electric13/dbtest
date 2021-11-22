@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div @upd-item="updItem" @add-item="addItem">
     <table>
         <tr>
             <th>Код стр.</th>
@@ -27,11 +27,12 @@
 import BasketItem from "./BasketItem";
 import axios from "axios";
 
-function BaskItem(parent, id, m_id, p_id, amount, length, price) {
+function BaskItem(parent, id, m_id, p_id, i_id, amount, length, price) {
     this.parent = parent;
     this.id = id;
     this.m_id = m_id;
     this.p_id = p_id;
+    this.i_id = i_id;
     this.amount = amount;
     this.length = length;
     this.price = price;
@@ -47,7 +48,6 @@ export default {
           materials: [],
           products: [],
           linksMT: [],       //соответствие толщин материалам
-          linksTM: [],       //соответствие материалов толщинам
           basketID: ''
       }
   },
@@ -104,6 +104,7 @@ export default {
                   this.items.push(new BaskItem(this, i.id,
                                                      i.material,
                                                      i.product,
+                                                     i.item,
                                                      i.amount,
                                                      i.length,
                                                      0))
@@ -115,6 +116,10 @@ export default {
 
       async addItem() {
           this.items.push(new BaskItem(this, 10, 6, 5, 7, 1440, 23.0));
+      },
+
+      async updItem(id) {
+          console.log('app need to update line ' + id);
       },
 
       async delItem(id) {

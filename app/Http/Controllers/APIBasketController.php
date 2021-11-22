@@ -10,6 +10,7 @@ use App\Models\Basket;
 class APIBasketController extends Controller
 {
     private function getBasket($session_id) {
+        // заменить на findOrCreate!!!
         $b = Basket::where('session_id', '=', $session_id)->first();
         if ( !$b) {
             $id = Basket::create(['session_id' => $session_id])->id;
@@ -24,8 +25,8 @@ class APIBasketController extends Controller
         if (! $b) {
             return ['NoBasketYet' => true];
         } else {
-            $bi = BasketItem::where('basket_id', $b->id)->get();
-            return new BasketItemCollection($bi);
+            return new BasketItemCollection(
+                BasketItem::where('basket_id', $b->id)->orderBy('id')->get());
         }
     }
 
@@ -41,26 +42,63 @@ class APIBasketController extends Controller
     }
 
     public function apiAdd(BasketItemRequest $request){
-        $id = $this->getBasket($request->request->get('key'));
-        BasketItem::create(
+        $basket_id = $this->getBasket($request->request->get('key'));
+        $item = BasketItem::create(
             [
-                'basket_id' => $id,
+                'basket_id' => $basket_id,
                 'material_id' => $request->request->getInt('material'),
                 'product_id' => $request->request->getInt('product'),
                 'item_id' => $request->request->getInt('item'),
                 'length' => $request->request->getInt('length'),
                 'amount' => $request->request->getInt('amount')
             ]);
+
         return new BasketItemCollection(
-                      BasketItem::where('basket_id', $id)->get());
+            BasketItem::where('basket_id', $basket_id)
+                      ->where('id', $item->id)
+                      ->get());
     }
 
+    public function apiUpd(BasketItemRequest $request){
+        //получаем идентификатор корзины из ключа
+        $basket_id = $this->getBasket($request->request->get('key'));
+        //получаем код строки для редактирования
+        $id = $request->request->getInt('id');
+        //обновляем строку в корзине, проверяя и ключ, и принадлежность к корзине,
+        //чтобы нельзя было редактировать строки в чужих корзинах.
+        //В дальнейшем надо прикрутить проверку связи корзины с пользователем
+
+        //если вновь задано кол-во 0, то вызываем удаление элемента
+        if ( $request->request->getInt('amount') == 0) {
+            return $this->apiDel($request);
+        }
+
+        BasketItem::where('basket_id', $basket_id)
+                  ->where('id', $id)
+                  ->update(
+            [   'material_id' => $request->request->getInt('material'),
+                'product_id' => $request->request->getInt('product'),
+                'item_id' => $request->request->getInt('item'),
+                'length' => $request->request->getInt('length'),
+                'amount' => $request->request->getInt('amount')
+            ]);
+
+        return new BasketItemCollection(
+            BasketItem::where('basket_id', $basket_id)
+                      ->where('id', $id)
+                      ->orderBy('id')->get());
+    }
+
+
     public function apiDel(BasketItemRequest $request){
-        $id = $this->getBasket($request->request->get('key'));
-        BasketItem::where('basket_id', $id)
+        $b = Basket::where('session_id', $request->request->get('key'))->first();
+        if (!$b) {
+            return ['NoBasketYet' => true];
+        }
+        $basket_id = $b->id;
+        BasketItem::where('basket_id', $basket_id)
                   ->where('id', $request->request->getInt('id'))
                   ->delete();
-        return new BasketItemCollection(
-            BasketItem::where('basket_id', $id)->get());
+        return ['Deleted' => $request->request->getInt('id')];
     }
 }
