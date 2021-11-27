@@ -2,8 +2,15 @@
     <tr>
         <td>{{ id }}</td>
         <td>
-            {{ product }}&nbsp;
-            <select v-model="sMaterial" v-on:change="changeMaterial(id)">
+            <select v-model="product_id">
+                <option
+                    v-for="prod in productList"
+                    :value="prod.id"
+                    :selected="prod.id === product_id"
+                >{{ prod.product }}
+                </option>
+            </select>&nbsp;
+            <select v-if="product_id != 10" v-model="sMaterial" v-on:change="changeMaterial(id)">
                 <option
                     v-for="mat in materialList"
                     :value="mat.m"
@@ -11,7 +18,7 @@
                 >{{ mat.m }}
                 </option>
             </select>&nbsp;
-            <select v-bind="tList" v-model="material_id" v-on:change="changeThickness(id)">
+            <select v-if="product_id != 10" v-bind="tList" v-model="material_id" v-on:change="changeThickness(id)">
                 <option
                     v-for="thc in tList"
                     :value="thc.id"
@@ -126,6 +133,7 @@ export default {
             'sMaterial':    '',
             'sThickness':   0,
             'material_id':  0,
+            'product_id':   0,
             'tList':        []
         }
     },
@@ -142,6 +150,11 @@ export default {
         return this.parent.linksMT;
     },
 
+    productList: function(){
+        return this.parent.products;
+    },
+
+
 	sum: function() {
 	    return this.amount * this.price;
 	}
@@ -152,6 +165,7 @@ export default {
         this.sMaterial = this.material();
         this.sThickness = this.thickness();
         this.material_id = this.m_id;
+        this.product_id = this.p_id;
         this.tList = this.thicknessList();
     }
 }
