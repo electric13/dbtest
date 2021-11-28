@@ -2,7 +2,7 @@
     <tr>
         <td>{{ id }}</td>
         <td>
-            <select v-model="product_id">
+            <select v-model="product_id" v-on:change="changeProduct">
                 <option
                     v-for="prod in productList"
                     :value="prod.id"
@@ -26,7 +26,11 @@
                     :selected="thc.id === m_id"
                 >{{ thc.thickness }}
                 </option>
-            </select>
+            </select>&nbsp;
+            <input type="text" v-on:keypress="onlyNumbers"
+                               v-model="cLength"
+                               v-on:keyup="changeLength"
+                               v-on:change="changeLength"/>
             </span>
             <span v-if="product_id == 10">
             <select v-model="group_id" v-on:change="changeItemGroup">
@@ -47,10 +51,16 @@
             </select>&nbsp;
             </span>
         </td>
-        <td>{{ length/1000 }}м</td>
-        <td>{{ amount }}</td>
+        <td>
+            <input type="text"
+                   v-on:keypress="onlyNumbers"
+                   v-on:keyup="changeAmount"
+                   v-model="cAmount"
+                   v-on:change="changeAmount"
+            />
+        </td>
         <td><button :disabled="bt_disabled" @click="del">Удалить</button></td>
-        <td colspan="5" v-if="product_id != 10">{{ sMaterial + ' ' + thickness() + 'мм'}}</td>
+        <td colspan="5" v-if="product_id != 10">{{ pLength/1000 + 'м, ' + sMaterial + ' ' + thickness() + 'мм'}}</td>
         <td colspan="5" v-if="product_id == 10">{{ group_id + ':' + item_id }}</td>
     </tr>
 </template>
@@ -67,30 +77,41 @@ export default {
         },
 
         postData() {
+
             let req = {
                         "key": this.parent.basketID,
                         "id": this.id,
                         "material": this.material_id,
                         "product": this.product_id,
-                        "amount": this.amount,
+                        "amount": this.pAmount,
                         "item": this.item_id,
-                        "length": this.length
+                        "length": this.pLength
                       }
-            console.log('update line '+this.id);
-            console.log(req);
+            //console.log('update line '+this.id);
+            //console.log(req);
             axios.post('/api/basket/update', req, {})
                     .then(() => { this.$emit('upd-item', this.id); })
                     .catch(() => { this.$emit('upd-item', this.id); });
         },
 
-        changeThickness() {
-            let idx = this.tList.findIndex(x => x.id === this.material_id);
-            if (idx >= 0) {
-                this.sThickness = this.tList[idx].thickness;
-            } else {
-                this.sThickness = 0;
+        changeProduct(){
+            if (this.product_id === 10 && this.item_id === 0) {
+                // если меняем вид продукции с мерной на штучную, при этом
+                // ранее не редактировали, то находим первый товар и
+                // соответствующую ему группу
+                this.item_id = Number(Object.keys(this.parent.nom)[0]);
+                this.group_id = this.parent.nom[this.item_id].group_id;
+                this.grItems = this.nomList()
             }
-            this.postData();
+            if (this.product_id !== 10 && this.material_id === 0) {
+                // если меняем штучный товар на мерную продукцию, и при этом
+                // ранее не задавалось, на какую - то подставляем самый первый материал
+                // из списка материалов.
+                this.material_id = this.parent.materials[0].id;
+                this.sMaterial = this.material();
+                this.tList = this.thicknessList();
+                this.cLength = this.pLength = 1000;
+            }
         },
 
         changeMaterial() {
@@ -107,6 +128,16 @@ export default {
             this.postData();
         },
 
+        changeThickness() {
+            let idx = this.tList.findIndex(x => x.id === this.material_id);
+            if (idx >= 0) {
+                this.sThickness = this.tList[idx].thickness;
+            } else {
+                this.sThickness = 0;
+            }
+            this.postData();
+        },
+
         changeItemGroup() {
             this.grItems = this.nomList()
             this.item_id = this.grItems[0].id
@@ -117,6 +148,29 @@ export default {
             this.postData();
         },
 
+        changeLength() {
+            this.cLength = Number(this.cLength);
+            if ( this.cLength >= 200 && this.cLength <= 8000 && this.pLength != this.cLength) {
+                this.pLength = this.cLength;
+                this.postData();
+            }
+        },
+
+        changeAmount() {
+            this.cAmount = Number(this.cAmount);
+            if ( this.cAmount > 0 && this.cAmount <= 99000 && this.pAmount != this.cAmount) {
+                this.pAmount = this.cAmount;
+                this.postData();
+            }
+        },
+
+        onlyNumbers(event){
+            let keyCode = event.keyCode ? event.keyCode : event.which;
+            if (keyCode < 48 || keyCode > 57) {
+                event.preventDefault();
+            }
+
+        },
 
         //Возвращает наименование материала в текстовом виде
         material: function() {
@@ -129,7 +183,7 @@ export default {
 
         //Возвращает наименование толщины материала в текстовом виде
         thickness: function() {
-            let id = this.parent.materials.findIndex(x => x.id === this.m_id);
+            let id = this.parent.materials.findIndex(x => x.id === this.material_id);
             if (id >= 0) {
                 return this.parent.materials[id].thickness; }
             else { return ""; }
@@ -173,9 +227,13 @@ export default {
             'material_id':  0,
             'product_id':   0,
             'item_id':      0,
-            'group_id':    0,
+            'group_id':     0,
             'tList':        [],
-            'grItems':      []
+            'grItems':      [],
+            'cAmount':      0,  //текущее кол-во в поле ввода
+            'cLength':      0,  //текущая длина в поле ввода
+            'pAmount':      0,  //ранее сохраненное корректное количество
+            'pLength':      0   //ранее сохраненная корректная длина
         }
     },
 
@@ -211,11 +269,13 @@ export default {
     created() {
         this.bt_disabled = false;
         this.product_id = this.p_id
+        this.cAmount = this.pAmount = this.amount
+        this.cLength = this.pLength = this.length
         if (this.product_id != 10) {
             // для мерных товаров учитываем их параметры (длина, материал)
+            this.material_id = this.m_id;
             this.sMaterial = this.material();
             this.sThickness = this.thickness();
-            this.material_id = this.m_id;
             this.tList = this.thicknessList();
         } else {
             // для штучных товаров учитываем их параметры (артикул и группа)

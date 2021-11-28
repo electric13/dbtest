@@ -23,8 +23,6 @@ class BasketItemRequest extends FormRequest
      */
     private function rulesAdd(){
         return [
-            // доработать правила, чтобы item проверялся только при product=10
-            // а material и length - при product != 10
             'product'  => 'required|integer|exists:products,id',
             'material' => 'exclude_if:product,10|required|integer|exists:materials,id',
             'length' => 'exclude_if:product,10|required|integer|min:200|max:10000',
