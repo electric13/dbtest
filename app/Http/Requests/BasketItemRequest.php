@@ -25,14 +25,24 @@ class BasketItemRequest extends FormRequest
         return [
             // доработать правила, чтобы item проверялся только при product=10
             // а material и length - при product != 10
-            'material' => 'required|integer|exists:materials,id',
             'product'  => 'required|integer|exists:products,id',
-            'item' => 'required|integer|exists:items,id',
-            'length' => 'required|integer|min:200|max:10000',
+            'material' => 'exclude_if:product,10|required|integer|exists:materials,id',
+            'length' => 'exclude_if:product,10|required|integer|min:200|max:10000',
             'amount' => 'required|integer|min:1|max:99000',
         ];
     }
 
+    protected function getValidatorInstance(){
+        $validator = parent::getValidatorInstance();
+
+        // required_if:product,10|integer|exists:items,id
+        $validator->sometimes('item', 'required|exists:items,id', function($input)
+        {
+            return $input->product === 10;
+        });
+
+        return $validator;
+    }
 
     public function rules()
     {

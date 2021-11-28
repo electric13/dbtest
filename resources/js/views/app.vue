@@ -108,8 +108,9 @@ export default {
                   let l_g = response.data.data;
                   for (let gr of l_g) {
                       this.n_groups[gr.id] = {
+                          'id'       : gr.id,
                           'groupname': gr.groupname,
-                          'colored': gr.colored
+                          'colored'  : gr.colored
                       };
                   }
               }));
@@ -140,9 +141,6 @@ export default {
                                                      i.amount,
                                                      i.length,
                                                      0))
-              }
-              for (let n in this.nom) {
-                  console.log(n);
               }
           });
       },

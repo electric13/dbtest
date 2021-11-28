@@ -10,7 +10,8 @@
                 >{{ prod.product }}
                 </option>
             </select>&nbsp;
-            <select v-if="product_id != 10" v-model="sMaterial" v-on:change="changeMaterial(id)">
+            <span v-if="product_id != 10">
+            <select v-model="sMaterial" v-on:change="changeMaterial(id)">
                 <option
                     v-for="mat in materialList"
                     :value="mat.m"
@@ -18,28 +19,39 @@
                 >{{ mat.m }}
                 </option>
             </select>&nbsp;
-            <select v-if="product_id == 10">
-                <option
-                    v-for="nm in nomList"
-                    :value="nm.id"
-                    :selected="nm.id === item_id"
-                >{{ nm.itemname }}
-                </option>
-            </select>&nbsp;
-
-            <select v-if="product_id != 10" v-bind="tList" v-model="material_id" v-on:change="changeThickness(id)">
+            <select v-bind="tList" v-model="material_id" v-on:change="changeThickness(id)">
                 <option
                     v-for="thc in tList"
                     :value="thc.id"
                     :selected="thc.id === m_id"
                 >{{ thc.thickness }}
                 </option>
+            </select>
+            </span>
+            <span v-if="product_id == 10">
+            <select v-model="group_id" v-on:change="changeItemGroup">
+                <option
+                    v-for="gr in groupsList"
+                    :value="gr.id"
+                    :selected="gr.id === group_id"
+                >{{ gr.groupname }}
+                </option>
             </select>&nbsp;
+            <select v-bind="grItems" v-model="item_id" v-on:change="changeItem">
+                <option
+                    v-for="nm in grItems"
+                    :value="nm.id"
+                    :selected="nm.id === item_id"
+                >{{ nm.itemname }}
+                </option>
+            </select>&nbsp;
+            </span>
         </td>
         <td>{{ length/1000 }}м</td>
         <td>{{ amount }}</td>
         <td><button :disabled="bt_disabled" @click="del">Удалить</button></td>
-        <td colspan="5">{{ sMaterial + ' ' + thickness() + 'мм'}}</td>
+        <td colspan="5" v-if="product_id != 10">{{ sMaterial + ' ' + thickness() + 'мм'}}</td>
+        <td colspan="5" v-if="product_id == 10">{{ group_id + ':' + item_id }}</td>
     </tr>
 </template>
 
@@ -59,9 +71,9 @@ export default {
                         "key": this.parent.basketID,
                         "id": this.id,
                         "material": this.material_id,
-                        "product": this.p_id,
+                        "product": this.product_id,
                         "amount": this.amount,
-                        "item": this.i_id,
+                        "item": this.item_id,
                         "length": this.length
                       }
             console.log('update line '+this.id);
@@ -95,6 +107,17 @@ export default {
             this.postData();
         },
 
+        changeItemGroup() {
+            this.grItems = this.nomList()
+            this.item_id = this.grItems[0].id
+            this.changeItem();
+        },
+
+        changeItem() {
+            this.postData();
+        },
+
+
         //Возвращает наименование материала в текстовом виде
         material: function() {
             let id = this.parent.materials.findIndex(x => x.id === this.m_id);
@@ -123,7 +146,13 @@ export default {
             else { return {};}
         },
 
-    },
+        //возвращает массив товаров для текущей группы
+        nomList: function(){
+            let currGroup = this.group_id;
+            return this.parent.nom.filter( item => item.group_id == currGroup );
+        },
+
+    }, //методы
 
     props: [
         'parent',
@@ -145,7 +174,8 @@ export default {
             'product_id':   0,
             'item_id':      0,
             'group_id':    0,
-            'tList':        []
+            'tList':        [],
+            'grItems':      []
         }
     },
 
@@ -161,33 +191,38 @@ export default {
         return this.parent.linksMT;
     },
 
-    nomList: function(){
-        
-        return this.parent.nom;
+    groupsList: function(){
+        return this.parent.n_groups.filter( () => true );
+    },
+
+    nom: function(){
+        return this.parent.nom[this.item_id].itemname;
     },
 
     productList: function(){
         return this.parent.products;
     },
 
-
 	sum: function() {
 	    return this.amount * this.price;
 	}
-    }, // конец раздел computed
+    }, // конец раздела computed
 
     created() {
         this.bt_disabled = false;
-        this.sMaterial = this.material();
-        this.sThickness = this.thickness();
-        this.material_id = this.m_id;
-        this.product_id = this.p_id;
-        if (this.product_id == 10) {
+        this.product_id = this.p_id
+        if (this.product_id != 10) {
+            // для мерных товаров учитываем их параметры (длина, материал)
+            this.sMaterial = this.material();
+            this.sThickness = this.thickness();
+            this.material_id = this.m_id;
+            this.tList = this.thicknessList();
+        } else {
+            // для штучных товаров учитываем их параметры (артикул и группа)
             this.item_id = this.i_id;
             this.group_id = this.parent.nom[this.item_id].group_id;
-            console.log(this.group_id+' группа, товар - '+this.item_id);
+            this.grItems = this.nomList()
         }
-        this.tList = this.thicknessList();
     }
 }
 </script>
