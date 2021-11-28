@@ -7,5 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class ItemGroup extends Model
 {
-    //use HasFactory;
+    public $timestamps = false;
+
+    protected $fillable = [
+        'groupname','colored'
+    ];
 }

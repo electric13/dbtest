@@ -16,6 +16,8 @@ class DatabaseSeeder extends Seeder
         $this->call(MaterialsTableSeeder::class);
         $this->call(ProductTableSeeder::class);
         $this->call(OrderLineTableSeeder::class);
+        $this->call(ItemGroupsSeeder::class);
+        $this->call(ItemSeeder::class);
         //\App\Models\Contact::factory(10)->create();
         //\\App\Models\Material::factory(1)->create();
         //\App\Models\Material::factory(1)->create();

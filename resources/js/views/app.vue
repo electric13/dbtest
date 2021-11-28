@@ -44,10 +44,12 @@ export default {
   computed: {},
   data() {
       return {
-          items: [],
-          materials: [],
-          products: [],
-          linksMT: [],       //соответствие толщин материалам
+          items: [],        // элементы корзины, не справочник товаров!
+          nom: [],          // справочник штучного товара
+          n_groups: [],      // справочник товарных групп
+          materials: [],    // справочник материалов
+          products: [],     // справочник видов продукции
+          linksMT: [],      //соответствие толщин материалам
           basketID: ''
       }
   },
@@ -56,6 +58,7 @@ export default {
           // To do
       },
       async read() {
+          // чтение справочников и после этого построение корзины, с использованием данных оттуда
           let promises = [], tmp = [];
           //загружаем справочник материалов
           if (this.materials.length == 0) {
@@ -84,6 +87,35 @@ export default {
               }));
           }
 
+          // справочник штучного товара
+          if (this.nom.length == 0) {
+              promises.push(axios.get('/api/items').then(response => {
+                  let l_i = response.data.data;
+                  for (let nom_item of l_i) {
+                      this.nom[nom_item.id] = {
+                          'id'      : nom_item.id,
+                          'itemname': nom_item.itemname,
+                          'group_id': nom_item.group_id,
+                          'color'   : nom_item.color
+                      };
+                  }
+              }));
+          }
+
+          // справочник групп штучного товара
+          if (this.n_groups.length == 0) {
+              promises.push(axios.get('/api/groups').then(response => {
+                  let l_g = response.data.data;
+                  for (let gr of l_g) {
+                      this.n_groups[gr.id] = {
+                          'groupname': gr.groupname,
+                          'colored': gr.colored
+                      };
+                  }
+              }));
+          }
+
+          //ищем ключ с прошлого сеанса, если нет - генерируем новый.
           if ( localStorage.getItem('session_id') == null) {
               promises.push(axios.get('/api/register').then(response => {
                   this.basketID = response.data.key;
@@ -109,16 +141,23 @@ export default {
                                                      i.length,
                                                      0))
               }
+              for (let n in this.nom) {
+                  console.log(n);
+              }
           });
       },
       async update() {
+          // Зачем это все?
       },
 
       async addItem() {
+          // Добавление в корзину должно быть в отдельном компоненте
           this.items.push(new BaskItem(this, 10, 6, 5, 7, 1440, 23.0));
       },
 
       async updItem(id) {
+          // тоже хз зачем это, каждый компонент обновляется сам. Возможно, надо сделать очередь
+          // куда складывать все обновление, и централизованно обновлять.
           console.log('app need to update line ' + id);
       },
 

@@ -7,5 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class Item extends Model
 {
-    //use HasFactory;
+    public $timestamps = false;
+
+    protected $fillable = [
+        'itemname', 'group_id','color'
+    ];
+
+    public function group() {
+        return $this->belongsTo(ItemGroup::class, 'group_id');
+    }
 }

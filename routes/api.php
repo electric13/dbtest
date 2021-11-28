@@ -27,3 +27,6 @@ Route::post('basket/update',  [APIBasketController::class, 'apiUpd']);
 
 Route::get('materials',    [APIRefDataController::class, 'apiMatIndex']);
 Route::get('products',     [APIRefDataController::class, 'apiProdIndex']);
+Route::get('items',        [APIRefDataController::class, 'apiItemsIndex']);
+Route::get('groups',       [APIRefDataController::class, 'apiGroupsIndex']);
+

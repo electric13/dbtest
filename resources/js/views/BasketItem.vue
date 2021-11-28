@@ -18,6 +18,15 @@
                 >{{ mat.m }}
                 </option>
             </select>&nbsp;
+            <select v-if="product_id == 10">
+                <option
+                    v-for="nm in nomList"
+                    :value="nm.id"
+                    :selected="nm.id === item_id"
+                >{{ nm.itemname }}
+                </option>
+            </select>&nbsp;
+
             <select v-if="product_id != 10" v-bind="tList" v-model="material_id" v-on:change="changeThickness(id)">
                 <option
                     v-for="thc in tList"
@@ -134,6 +143,8 @@ export default {
             'sThickness':   0,
             'material_id':  0,
             'product_id':   0,
+            'item_id':      0,
+            'group_id':    0,
             'tList':        []
         }
     },
@@ -148,6 +159,11 @@ export default {
 
     materialList: function(){
         return this.parent.linksMT;
+    },
+
+    nomList: function(){
+        
+        return this.parent.nom;
     },
 
     productList: function(){
@@ -166,6 +182,11 @@ export default {
         this.sThickness = this.thickness();
         this.material_id = this.m_id;
         this.product_id = this.p_id;
+        if (this.product_id == 10) {
+            this.item_id = this.i_id;
+            this.group_id = this.parent.nom[this.item_id].group_id;
+            console.log(this.group_id+' группа, товар - '+this.item_id);
+        }
         this.tList = this.thicknessList();
     }
 }
