@@ -10,7 +10,7 @@
                 >{{ prod.product }}
                 </option>
             </select>&nbsp;
-            <span v-if="product_id != 10">
+            <span v-if="product_id !== 10">
             <select v-model="sMaterial" v-on:change="changeMaterial(id)">
                 <option
                     v-for="mat in materialList"
@@ -30,9 +30,10 @@
             <input type="text" v-on:keypress="onlyNumbers"
                                v-model="cLength"
                                v-on:keyup="changeLength"
-                               v-on:change="changeLength"/>
+                               v-on:change="changeLength"
+                               @blur="checkDirty" />
             </span>
-            <span v-if="product_id == 10">
+            <span v-if="product_id === 10">
             <select v-model="group_id" v-on:change="changeItemGroup">
                 <option
                     v-for="gr in groupsList"
@@ -53,19 +54,28 @@
         </td>
         <td>
             <input type="text"
-                   v-on:keypress="onlyNumbers"
-                   v-on:keyup="changeAmount"
+                   @keypress="onlyNumbers"
+                   @keyup="changeAmount"
                    v-model="cAmount"
-                   v-on:change="changeAmount"
+                   @change="changeAmount"
+                   @blur="checkDirty"
             />
         </td>
         <td><button :disabled="bt_disabled" @click="del">Удалить</button></td>
-        <td colspan="5" v-if="product_id != 10">{{ pLength/1000 + 'м, ' + sMaterial + ' ' + thickness() + 'мм'}}</td>
-        <td colspan="5" v-if="product_id == 10">{{ group_id + ':' + item_id }}</td>
+        <td colspan="5" v-if="product_id !== 10">{{ pLength/1000 + 'м, ' + sMaterial + ' ' + thickness() + 'мм'}}</td>
+        <td colspan="5" v-if="product_id === 10">{{ group_id + ':' + item_id }}</td>
     </tr>
 </template>
 
 <script>
+
+function QueueItem(id, command, request, url, ){
+    this.id = id
+    this.request = request
+    this.url = url
+    this.command = command
+}
+
 export default {
 
     name: "BasketItem",
@@ -77,7 +87,6 @@ export default {
         },
 
         postData() {
-
             let req = {
                         "key": this.parent.basketID,
                         "id": this.id,
@@ -87,11 +96,33 @@ export default {
                         "item": this.item_id,
                         "length": this.pLength
                       }
-            //console.log('update line '+this.id);
-            //console.log(req);
+
+            this.postRequestInQueue(new QueueItem(this.id, 'update', req, '/api/basket/update'))
             axios.post('/api/basket/update', req, {})
                     .then(() => { this.$emit('upd-item', this.id); })
-                    .catch(() => { this.$emit('upd-item', this.id); });
+                    .catch(() => { this.$emit('upd-item', this.id); })
+        },
+
+        postRequestInQueue( reqObj ){
+            let qID = -1
+            qID = this.parent.requests.findIndex(x => x.id === this.id)
+            this.parent.needUpd = true
+            if (qID < 0 ) {
+                // если других запросов для данной строки нет - помещаем запрос в очередь, на этом всё
+                this.parent.requests.push( reqObj )
+            } else {
+                this.parent.requests[qID] = reqObj;
+            }
+        },
+
+        checkDirty(){
+            console.log(this.cAmount+' '+this.pAmount+' '+this.cLength +' '+this.pLength)
+            if (this.cAmount !== this.pAmount) {
+                this.cAmount = this.pAmount;
+            }
+            if (this.cLength !== this.pLength) {
+                this.cLength = this.pLength
+            }
         },
 
         changeProduct(){
@@ -150,7 +181,7 @@ export default {
 
         changeLength() {
             this.cLength = Number(this.cLength);
-            if ( this.cLength >= 200 && this.cLength <= 8000 && this.pLength != this.cLength) {
+            if ( this.cLength >= 200 && this.cLength <= 8000 && this.pLength !== this.cLength) {
                 this.pLength = this.cLength;
                 this.postData();
             }
@@ -158,18 +189,16 @@ export default {
 
         changeAmount() {
             this.cAmount = Number(this.cAmount);
-            if ( this.cAmount > 0 && this.cAmount <= 99000 && this.pAmount != this.cAmount) {
+            if ( this.cAmount > 0 && this.cAmount <= 99000 && this.pAmount !== this.cAmount) {
                 this.pAmount = this.cAmount;
                 this.postData();
             }
         },
 
         onlyNumbers(event){
-            let keyCode = event.keyCode ? event.keyCode : event.which;
-            if (keyCode < 48 || keyCode > 57) {
+            if (! this.digits.has(event.key)) {
                 event.preventDefault();
             }
-
         },
 
         //Возвращает наименование материала в текстовом виде
@@ -203,7 +232,7 @@ export default {
         //возвращает массив товаров для текущей группы
         nomList: function(){
             let currGroup = this.group_id;
-            return this.parent.nom.filter( item => item.group_id == currGroup );
+            return this.parent.nom.filter( item => item.group_id === currGroup );
         },
 
     }, //методы
@@ -233,7 +262,8 @@ export default {
             'cAmount':      0,  //текущее кол-во в поле ввода
             'cLength':      0,  //текущая длина в поле ввода
             'pAmount':      0,  //ранее сохраненное корректное количество
-            'pLength':      0   //ранее сохраненная корректная длина
+            'pLength':      0,  //ранее сохраненная корректная длина
+            'digits':       {}
         }
     },
 
@@ -271,7 +301,8 @@ export default {
         this.product_id = this.p_id
         this.cAmount = this.pAmount = this.amount
         this.cLength = this.pLength = this.length
-        if (this.product_id != 10) {
+        this.digits = new Set(['0','1','2','3','4','5','6','7','8','9'])
+        if (this.product_id !== 10) {
             // для мерных товаров учитываем их параметры (длина, материал)
             this.material_id = this.m_id;
             this.sMaterial = this.material();

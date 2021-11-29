@@ -49,18 +49,33 @@ export default {
           materials: [],    // справочник материалов
           products: [],     // справочник видов продукции
           linksMT: [],      //соответствие толщин материалам
-          basketID: ''
+          basketID: '',
+          requests: [],     // запросы на обновление
+          needUpd: false    // индикатор недавнего обновления
       }
   },
   methods: {
-      async create() {
-          // To do
+      timerHandler(){
+          let qN = this.requests.length
+          if ( qN > 0 && this.needUpd ) {
+              // недавно обновляли, ждем секунду бездействия
+              this.needUpd = false
+          }
+          if ( qN > 0 && ! this.needUpd) {
+              //обновлений не было, можно обрабатывать
+              console.log('Запросов в очереди '+ this.requests.length)
+              let req = this.requests.pop()
+              console.log(req.request)
+          }
+          // и засыпаем
+          setTimeout(this.timerHandler, 2500);
       },
-      async read() {
+
+      read() {
           // чтение справочников и после этого построение корзины, с использованием данных оттуда
           let promises = [], tmp = [];
           //загружаем справочник материалов
-          if (this.materials.length == 0) {
+          if (this.materials.length === 0) {
               promises.push(axios.get('/api/materials').then(response => {
                   this.materials = response.data.data;
                   // получаем список материалов
@@ -69,7 +84,7 @@ export default {
                   let obj = this;
                   this.linksMT = t.map( function (m) {
                       let thicknesses = this.materials.filter( function (material) {
-                          return this == material.material;
+                          return this === material.material;
                       }, m);
                       return {
                           "m": m,
@@ -80,14 +95,14 @@ export default {
           }
 
           //и справочник продукции
-          if (this.products.length == 0) {
+          if (this.products.length === 0) {
               promises.push(axios.get('/api/products').then(response => {
                   this.products = response.data.data;
               }));
           }
 
           // справочник штучного товара
-          if (this.nom.length == 0) {
+          if (this.nom.length === 0) {
               promises.push(axios.get('/api/items').then(response => {
                   let l_i = response.data.data;
                   for (let nom_item of l_i) {
@@ -102,7 +117,7 @@ export default {
           }
 
           // справочник групп штучного товара
-          if (this.n_groups.length == 0) {
+          if (this.n_groups.length === 0) {
               promises.push(axios.get('/api/groups').then(response => {
                   let l_g = response.data.data;
                   for (let gr of l_g) {
@@ -143,9 +158,6 @@ export default {
               }
           });
       },
-      async update() {
-          // Зачем это все?
-      },
 
       async addItem() {
           // Добавление в корзину должно быть в отдельном компоненте
@@ -172,7 +184,8 @@ export default {
     BasketItem
   },
   created() {
-    this.read();
+      this.read();
+      setTimeout(this.timerHandler, 2500);
   }
 };
 
