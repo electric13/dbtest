@@ -14,16 +14,19 @@
             :key="item.id"
             @del-item="delItem"
         />
-
     </table>
-     <br>BasketID={{ basketID }}<br>
-     <button @click="addItem">Добавить</button>
+    <br>BasketID={{ basketID }}<br>
+    <combo-box
+        v-bind="cbox"
+    />
+    <button @click="addItem">Добавить</button>
   </div>
 </template>
 
 <script>
 
 import BasketItem from "./BasketItem";
+import ComboBox from "./ComboBox";
 import axios from "axios";
 
 function BaskItem(parent, id, m_id, p_id, i_id, amount, length, price) {
@@ -51,7 +54,8 @@ export default {
           linksMT: [],      //соответствие толщин материалам
           basketID: '',
           requests: [],     // запросы на обновление
-          needUpd: false    // индикатор недавнего обновления
+          needUpd: false,   // индикатор недавнего обновления
+          cbox: {}
       }
   },
   methods: {
@@ -181,12 +185,31 @@ export default {
       },
   },
   components: {
+      ComboBox,
     BasketItem
   },
   created() {
+      this.cbox = {
+          'title': 'Продукция',
+          'listItems': [
+              {'id':1,  'name':'Профнастил'},
+              {'id':2,  'name':'Металлочерепица'},
+              {'id':10, 'name':'Добор'}
+          ],
+          'index': -1
+      }
       this.read();
       setTimeout(this.timerHandler, 2500);
   }
 };
 
 </script>
+
+<style>
+
+body {
+    font-size: 0.75em;
+    font-family: 'Raleway', sans-serif;
+}
+
+</style>
