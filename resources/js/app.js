@@ -3,6 +3,9 @@ require('./demo');
 //require('./basket');
 
 import Vue from 'vue'
+import BootstrapVue from 'bootstrap-vue'
+
+Vue.use(BootstrapVue)
 
 //Main pages
 import App from './views/app.vue'

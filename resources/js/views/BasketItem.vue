@@ -2,23 +2,33 @@
     <tr>
         <td>{{ id }}</td>
         <td>
-            <select v-model="product_id" v-on:change="changeProduct">
-                <option
-                    v-for="prod in productList"
-                    :value="prod.id"
-                    :selected="prod.id === product_id"
-                >{{ prod.product }}
-                </option>
-            </select>&nbsp;
+            <b-dropdown size="sm" :text="product" class="m-2 prod-list">
+                <b-dropdown-item  v-for="prod in productList"
+                                  :key="prod.id"
+                                  @click="changeProduct(prod.id)"
+                                  :active="prod.id === product_id">
+                    {{ prod.product }}
+                </b-dropdown-item>
+            </b-dropdown>
             <span v-if="product_id !== 10">
-            <select v-model="sMaterial" v-on:change="changeMaterial(id)">
+            <b-dropdown size="sm" :text="sMaterial" class="m-0 p-0 mat-list">
+                <b-dropdown-item  v-for="mat in materialList"
+                                  :key="mat.m"
+                                  @click="changeMaterial(mat.m)"
+                                  :active="mat.m === sMaterial">
+                    {{ mat.m }}
+                </b-dropdown-item>
+            </b-dropdown>
+
+            <!--select v-model="sMaterial" v-on:change="changeMaterial(id)">
                 <option
                     v-for="mat in materialList"
                     :value="mat.m"
                     :selected="mat.m === material()"
                 >{{ mat.m }}
                 </option>
-            </select>&nbsp;
+            </select-->&nbsp;
+
             <select v-bind="tList" v-model="material_id" v-on:change="changeThickness(id)">
                 <option
                     v-for="thc in tList"
@@ -98,9 +108,9 @@ export default {
                       }
 
             this.postRequestInQueue(new QueueItem(this.id, 'update', req, '/api/basket/update'))
-            axios.post('/api/basket/update', req, {})
+            /* axios.post('/api/basket/update', req, {})
                     .then(() => { this.$emit('upd-item', this.id); })
-                    .catch(() => { this.$emit('upd-item', this.id); })
+                    .catch(() => { this.$emit('upd-item', this.id); }) */
         },
 
         postRequestInQueue( reqObj ){
@@ -125,7 +135,13 @@ export default {
             }
         },
 
-        changeProduct(){
+        changeProduct(newProductID){
+            if (this.product_id === newProductID) {
+                // вызывается при каждом щелчке по пункту списка, даже когда
+                // он уже выбран
+                return
+            }
+            this.product_id = newProductID
             if (this.product_id === 10 && this.item_id === 0) {
                 // если меняем вид продукции с мерной на штучную, при этом
                 // ранее не редактировали, то находим первый товар и
@@ -140,21 +156,28 @@ export default {
                 // из списка материалов.
                 this.material_id = this.parent.materials[0].id;
                 this.sMaterial = this.material();
+                console.log(this.material_id+ ':' + this.sMaterial)
                 this.tList = this.thicknessList();
                 this.cLength = this.pLength = 1000;
             }
+            this.postData()
         },
 
-        changeMaterial() {
-            this.tList = this.thicknessList(this.sMaterial);
-            let idx = this.tList.findIndex(x => x.thickness === this.sThickness);
+        changeMaterial(newMaterial) {
+            if (newMaterial === this.sMaterial) {
+                // если выбрали тот же самый материал, что был ранее
+                return
+            }
+            this.sMaterial = newMaterial
+            this.tList = this.thicknessList(this.sMaterial)
+            let idx = this.tList.findIndex(x => x.thickness === this.sThickness)
             if (idx >= 0) {
                 // у нового материала есть такая же толщина
-                this.material_id = this.tList[idx].id;
+                this.material_id = this.tList[idx].id
             } else {
                 //у вновь выбранного материала нет такой же толщины, как у предыдушего
-                this.material_id = this.tList[0].id;
-                this.sThickness =  this.tList[0].thickness;
+                this.material_id = this.tList[0].id
+                this.sThickness =  this.tList[0].thickness
             }
             this.postData();
         },
@@ -203,7 +226,7 @@ export default {
 
         //Возвращает наименование материала в текстовом виде
         material: function() {
-            let id = this.parent.materials.findIndex(x => x.id === this.m_id);
+            let id = this.parent.materials.findIndex(x => x.id === this.material_id);
             if (id >= 0) {
                 return this.parent.materials[id].material;
             }
@@ -270,7 +293,7 @@ export default {
     computed: {
     //Возвращает наименование продукта в текстовом виде
 	product: function() {
-	    let id = this.parent.products.findIndex(x => x.id === this.p_id);
+	    let id = this.parent.products.findIndex(x => x.id === this.product_id);
         if (typeof id != "undefined") { return this.parent.products[id].product; }
 	       else { return ""; }
 	},

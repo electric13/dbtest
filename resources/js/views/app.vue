@@ -1,5 +1,20 @@
 <template>
   <div @upd-item="updItem" @add-item="addItem">
+      <b-table-simple hover small caption-top responsive>
+          <b-thead head-variant="dark">
+              <b-tr>
+                  <b-th>Наименование</b-th>
+                  <b-th colspan="2">Кол.</b-th>
+              </b-tr>
+          </b-thead>
+          <b-tbody>
+              <b-tr>
+                  <b-td>Наименование</b-td>
+                  <b-td>Кол.</b-td>
+                  <b-td>Удалить</b-td>
+              </b-tr>
+          </b-tbody>
+      </b-table-simple>
     <table>
         <tr>
             <th>Код стр.</th>
@@ -16,9 +31,6 @@
         />
     </table>
     <br>BasketID={{ basketID }}<br>
-    <combo-box
-        v-bind="cbox"
-    />
     <button @click="addItem">Добавить</button>
   </div>
 </template>
@@ -26,7 +38,6 @@
 <script>
 
 import BasketItem from "./BasketItem";
-import ComboBox from "./ComboBox";
 import axios from "axios";
 
 function BaskItem(parent, id, m_id, p_id, i_id, amount, length, price) {
@@ -54,8 +65,7 @@ export default {
           linksMT: [],      //соответствие толщин материалам
           basketID: '',
           requests: [],     // запросы на обновление
-          needUpd: false,   // индикатор недавнего обновления
-          cbox: {}
+          needUpd: false    // индикатор недавнего обновления
       }
   },
   methods: {
@@ -185,19 +195,9 @@ export default {
       },
   },
   components: {
-      ComboBox,
     BasketItem
   },
   created() {
-      this.cbox = {
-          'title': 'Продукция',
-          'listItems': [
-              {'id':1,  'name':'Профнастил'},
-              {'id':2,  'name':'Металлочерепица'},
-              {'id':10, 'name':'Добор'}
-          ],
-          'index': -1
-      }
       this.read();
       setTimeout(this.timerHandler, 2500);
   }

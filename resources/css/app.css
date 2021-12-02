@@ -1,19 +1,8 @@
-table {
-    border: 1px solid #000;
-    border-collapse: collapse;
+
+.prod-list {
+    width: 170px;
 }
 
-tr {
-    border: 1px solid #000;
-    box-sizing: border-box;
-}
-
-th {
-    border: 1px solid #000;
-    box-sizing: border-box;
-}
-
-td {
-    border: 1px solid #000;
-    box-sizing: border-box;
+.mat-list {
+    width: 100px;
 }
