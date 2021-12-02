@@ -1,37 +1,23 @@
 <template>
-  <div @upd-item="updItem" @add-item="addItem">
-      <b-table-simple hover small caption-top responsive>
+  <div class="row" @upd-item="updItem" @add-item="addItem">
+      <div class="col-md-8 mx-auto">
+      <b-table-simple hover small caption-top responsive d-flex bordered>
           <b-thead head-variant="dark">
               <b-tr>
-                  <b-th>Наименование</b-th>
-                  <b-th colspan="2">Кол.</b-th>
+                  <b-th class="col-9">Наименование</b-th>
+                  <b-th class="col-3">Кол.</b-th>
               </b-tr>
           </b-thead>
           <b-tbody>
-              <b-tr>
-                  <b-td>Наименование</b-td>
-                  <b-td>Кол.</b-td>
-                  <b-td>Удалить</b-td>
-              </b-tr>
+              <basket-item
+                  v-for="item in items"
+                  v-bind="item"
+                  :key="item.id"
+                  @del-item="delItem"
+              />
           </b-tbody>
       </b-table-simple>
-    <table>
-        <tr>
-            <th>Код стр.</th>
-            <th>Наименование</th>
-            <th>Кол-во</th>
-            <th>Удалить</th>
-            <th>Дополнительно</th>
-        </tr>
-        <basket-item
-            v-for="item in items"
-            v-bind="item"
-            :key="item.id"
-            @del-item="delItem"
-        />
-    </table>
-    <br>BasketID={{ basketID }}<br>
-    <button @click="addItem">Добавить</button>
+      </div>
   </div>
 </template>
 

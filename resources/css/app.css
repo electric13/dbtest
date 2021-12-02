@@ -1,8 +1,12 @@
-
 .prod-list {
     width: 170px;
 }
 
 .mat-list {
     width: 100px;
+}
+
+.num-edit {
+    /*width: 170px !important;*/
+    background: red;
 }

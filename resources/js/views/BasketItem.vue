@@ -1,7 +1,6 @@
 <template>
-    <tr>
-        <td>{{ id }}</td>
-        <td>
+    <b-tr>
+        <b-td>
             <b-dropdown size="sm" :text="product" class="m-2 prod-list">
                 <b-dropdown-item  v-for="prod in productList"
                                   :key="prod.id"
@@ -19,24 +18,23 @@
                     {{ mat.m }}
                 </b-dropdown-item>
             </b-dropdown>
+            <b-dropdown size="sm" :text="thickness()" class="m-2 p-0">
+                <b-dropdown-item  v-for="thc in tList"
+                                  :key="thc.id"
+                                  @click="changeMaterialId(thc.id)"
+                                  :selected="thc.id === material_id">
+                    {{ thc.thickness }}
+                </b-dropdown-item>
+            </b-dropdown>
 
-            <!--select v-model="sMaterial" v-on:change="changeMaterial(id)">
-                <option
-                    v-for="mat in materialList"
-                    :value="mat.m"
-                    :selected="mat.m === material()"
-                >{{ mat.m }}
-                </option>
-            </select-->&nbsp;
-
-            <select v-bind="tList" v-model="material_id" v-on:change="changeThickness(id)">
+            <!--select v-bind="tList" v-model="material_id" v-on:change="changeThickness(id)">
                 <option
                     v-for="thc in tList"
                     :value="thc.id"
                     :selected="thc.id === m_id"
                 >{{ thc.thickness }}
                 </option>
-            </select>&nbsp;
+            </select-->&nbsp;
             <input type="text" v-on:keypress="onlyNumbers"
                                v-model="cLength"
                                v-on:keyup="changeLength"
@@ -61,20 +59,33 @@
                 </option>
             </select>&nbsp;
             </span>
-        </td>
-        <td>
-            <input type="text"
-                   @keypress="onlyNumbers"
-                   @keyup="changeAmount"
-                   v-model="cAmount"
-                   @change="changeAmount"
-                   @blur="checkDirty"
-            />
-        </td>
-        <td><button :disabled="bt_disabled" @click="del">Удалить</button></td>
-        <td colspan="5" v-if="product_id !== 10">{{ pLength/1000 + 'м, ' + sMaterial + ' ' + thickness() + 'мм'}}</td>
-        <td colspan="5" v-if="product_id === 10">{{ group_id + ':' + item_id }}</td>
-    </tr>
+        </b-td>
+        <b-td>
+            <b-container>
+            <b-row align-v="center">
+                <b-col cols="8">
+                    <b-input-group size="sm" class="m-2" append="шт">
+                        <b-form-input  @keypress="onlyNumbers"
+                                       @keyup="changeAmount"
+                                       v-model="cAmount"
+                                       @change="changeAmount"
+                                       @blur="checkDirty"
+                        ></b-form-input>
+                    </b-input-group>
+                </b-col>
+                <b-col cols="4">
+                    <b-button variant="danger" :disabled="bt_disabled" size="sm" @click="del" class="m-2">
+                        <icon name="trash"></icon>
+                    </b-button>
+                </b-col>
+            </b-row>
+            </b-container>
+            <!--input type="text"
+            /-->
+        </b-td>
+        <!--td colspan="5" v-if="product_id !== 10">{{ pLength/1000 + 'м, ' + sMaterial + ' ' + thickness() + 'мм'}}</td>
+        <td colspan="5" v-if="product_id === 10">{{ group_id + ':' + item_id }}</td-->
+    </b-tr>
 </template>
 
 <script>
@@ -182,12 +193,17 @@ export default {
             this.postData();
         },
 
-        changeThickness() {
-            let idx = this.tList.findIndex(x => x.id === this.material_id);
+        changeMaterialId(newMaterialId) {
+            if (newMaterialId === this.material_id){
+                // если выбрали тот же самый материал, что был ранее
+                return
+            }
+            this.material_id = newMaterialId
+            let idx = this.tList.findIndex(x => x.id === this.material_id)
             if (idx >= 0) {
-                this.sThickness = this.tList[idx].thickness;
+                this.sThickness = this.tList[idx].thickness
             } else {
-                this.sThickness = 0;
+                this.sThickness = 0
             }
             this.postData();
         },
