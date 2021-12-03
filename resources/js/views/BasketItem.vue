@@ -1,46 +1,52 @@
 <template>
     <b-tr>
         <b-td>
-            <b-dropdown size="sm" :text="product" class="m-2 prod-list">
-                <b-dropdown-item  v-for="prod in productList"
-                                  :key="prod.id"
-                                  @click="changeProduct(prod.id)"
-                                  :active="prod.id === product_id">
-                    {{ prod.product }}
-                </b-dropdown-item>
-            </b-dropdown>
-            <span v-if="product_id !== 10">
-            <b-dropdown size="sm" :text="sMaterial" class="m-0 p-0 mat-list">
-                <b-dropdown-item  v-for="mat in materialList"
-                                  :key="mat.m"
-                                  @click="changeMaterial(mat.m)"
-                                  :active="mat.m === sMaterial">
-                    {{ mat.m }}
-                </b-dropdown-item>
-            </b-dropdown>
-            <b-dropdown size="sm" :text="thickness()" class="m-2 p-0">
-                <b-dropdown-item  v-for="thc in tList"
-                                  :key="thc.id"
-                                  @click="changeMaterialId(thc.id)"
-                                  :selected="thc.id === material_id">
-                    {{ thc.thickness }}
-                </b-dropdown-item>
-            </b-dropdown>
+            <b-container class="p-0">
+            <b-form-row class="ml-0">
+            <b-col cols="4" class="text-left">
+                <b-dropdown size="sm" :text="product" class="mt-2 mr-2 prod-list">
+                    <b-dropdown-item  v-for="prod in productList"
+                                      :key="prod.id"
+                                      @click="changeProduct(prod.id)"
+                                      :active="prod.id === product_id">
+                        {{ prod.product }}
+                    </b-dropdown-item>
+                </b-dropdown>
+            </b-col>
+            <b-col v-if="product_id !== 10" cols="4" class="pl-0 pr-0">
+                <b-dropdown size="sm" :text="sMaterial" class="ml-2 mr-2 mt-2 mat-list">
+                    <b-dropdown-item  v-for="mat in materialList"
+                                      :key="mat.m"
+                                      @click="changeMaterial(mat.m)"
+                                      :active="mat.m === sMaterial">
+                        {{ mat.m }}
+                    </b-dropdown-item>
+                </b-dropdown>
+                <b-dropdown size="sm" :text="thickness()" class="mr-2 mt-2 p-0">
+                    <b-dropdown-item  v-for="thc in tList"
+                                      :key="thc.id"
+                                      @click="changeMaterialId(thc.id)"
+                                      :selected="thc.id === material_id">
+                        {{ thc.thickness }}
+                    </b-dropdown-item>
+                </b-dropdown>
+            </b-col>
+            <b-col v-if="product_id !== 10" cols="3" class="pl-0 pr-2">
+                <b-input-group size="sm" class="mt-2 ml-0" append="мм">
+                    <b-form-input  @keypress="onlyNumbers"
+                                   @keyup="changeLength"
+                                   v-model="cLength"
+                                   @change="changeLength"
+                                   @blur="checkDirty"
+                                   class="text-right"/>
+                </b-input-group>
+            </b-col>
+            <b-col v-if="product_id !== 10" cols="1" class="mt-2 ml-0 mr-0 pl-0 pt-2 text-right">
+                {{ pLength/1000 + 'м' }}
+            </b-col>
+            </b-form-row>
+            </b-container>
 
-            <!--select v-bind="tList" v-model="material_id" v-on:change="changeThickness(id)">
-                <option
-                    v-for="thc in tList"
-                    :value="thc.id"
-                    :selected="thc.id === m_id"
-                >{{ thc.thickness }}
-                </option>
-            </select-->&nbsp;
-            <input type="text" v-on:keypress="onlyNumbers"
-                               v-model="cLength"
-                               v-on:keyup="changeLength"
-                               v-on:change="changeLength"
-                               @blur="checkDirty" />
-            </span>
             <span v-if="product_id === 10">
             <select v-model="group_id" v-on:change="changeItemGroup">
                 <option
@@ -70,18 +76,17 @@
                                        v-model="cAmount"
                                        @change="changeAmount"
                                        @blur="checkDirty"
+                                       class="text-right"
                         ></b-form-input>
                     </b-input-group>
                 </b-col>
                 <b-col cols="4">
-                    <b-button variant="danger" :disabled="bt_disabled" size="sm" @click="del" class="m-2">
+                    <b-button variant="danger" :disabled="bt_disabled" size="sm" @click="del" class="ml-0">
                         <icon name="trash"></icon>
                     </b-button>
                 </b-col>
             </b-row>
             </b-container>
-            <!--input type="text"
-            /-->
         </b-td>
         <!--td colspan="5" v-if="product_id !== 10">{{ pLength/1000 + 'м, ' + sMaterial + ' ' + thickness() + 'мм'}}</td>
         <td colspan="5" v-if="product_id === 10">{{ group_id + ':' + item_id }}</td-->
