@@ -1,11 +1,12 @@
 <template>
   <div class="row" @upd-item="updItem" @add-item="addItem">
-      <div class="col-md-8 mx-auto">
+      <div class="col-10 mx-auto">
       <b-table-simple hover small caption-top responsive d-flex bordered>
           <b-thead head-variant="dark">
               <b-tr>
-                  <b-th class="col-9">Наименование</b-th>
-                  <b-th class="col-3">Кол.</b-th>
+                  <b-th class="col-8">Наименование</b-th>
+                  <b-th class="col-2">Количество</b-th>
+                  <b-th class="col-2">Стоимость</b-th>
               </b-tr>
           </b-thead>
           <b-tbody>
@@ -15,6 +16,9 @@
                   :key="item.id"
                   @del-item="delItem"
               />
+              <new-item-row v-if="dataLoaded"
+                            v-bind="adder"
+                            @add-item="reload"/>
           </b-tbody>
       </b-table-simple>
       </div>
@@ -24,6 +28,7 @@
 <script>
 
 import BasketItem from "./BasketItem";
+import NewItemRow from "./NewItemRow";
 import axios from "axios";
 
 function BaskItem(parent, id, m_id, p_id, i_id, amount, length, price) {
@@ -37,13 +42,14 @@ function BaskItem(parent, id, m_id, p_id, i_id, amount, length, price) {
     this.price = price;
 }
 
-const default_layout = "default";
+//const default_layout = "default";
 
 export default {
   computed: {},
   data() {
       return {
           items: [],        // элементы корзины, не справочник товаров!
+          adder: {},        // компонент "добавление нового товара в корзину"
           nom: [],          // справочник штучного товара
           n_groups: [],      // справочник товарных групп
           materials: [],    // справочник материалов
@@ -51,7 +57,8 @@ export default {
           linksMT: [],      //соответствие толщин материалам
           basketID: '',
           requests: [],     // запросы на обновление
-          needUpd: false    // индикатор недавнего обновления
+          needUpd: false,   // индикатор недавнего обновления
+          dataLoaded: false // флаг, что все загружено
       }
   },
   methods: {
@@ -69,6 +76,14 @@ export default {
           }
           // и засыпаем
           setTimeout(this.timerHandler, 2500);
+      },
+
+      reload() {
+          // перезагрузка данных при добавлении нового товара
+          console.log('Добавлено');
+          this.items = [];
+          this.adder = { 'parent': this }
+          this.read();
       },
 
       read() {
@@ -154,12 +169,14 @@ export default {
                                                      i.item,
                                                      i.amount,
                                                      i.length,
-                                                     0))
+                                                     125))
               }
-          });
+              this.adder = { 'parent': this }
+              this.dataLoaded = true
+          })
       },
 
-      async addItem() {
+      addItem() {
           // Добавление в корзину должно быть в отдельном компоненте
           this.items.push(new BaskItem(this, 10, 6, 5, 7, 1440, 23.0));
       },
@@ -181,7 +198,8 @@ export default {
       },
   },
   components: {
-    BasketItem
+      BasketItem,
+      NewItemRow
   },
   created() {
       this.read();

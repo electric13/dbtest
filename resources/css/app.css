@@ -3,10 +3,35 @@
 }
 
 .mat-list {
-    width: 100px;
+    width: 96px;
 }
 
-.num-edit {
+.grp-list {
+    width: 170px;
+}
+
+.thck-list {
+    width: 70px;
+}
+
+.item-list {
+    width: 344px;
+}
+
+.text-small{
+    font-size: 0.875rem;
+}
+
+.text-norm{
+    font-size: 1rem;
+}
+
+.field-red {
     /*width: 170px !important;*/
     background: red;
+}
+
+.field-blue {
+    /*width: 170px !important;*/
+    background: blue;
 }

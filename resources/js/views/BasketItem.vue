@@ -1,10 +1,17 @@
 <template>
-    <b-tr>
+    <b-tr class="p-0 m-0">
         <b-td>
-            <b-container class="p-0">
-            <b-form-row class="ml-0">
-            <b-col cols="4" class="text-left">
-                <b-dropdown size="sm" :text="product" class="mt-2 mr-2 prod-list">
+            <b-container class="p-0 text-left">
+            <!-- для отладки верстки!! -->
+            <!-- b-row class="m-0" align-v="center">
+                <b-col cols="3" class="field-blue">&nbsp;</b-col>
+                <b-col cols="3" class="field-red">&nbsp;</b-col>
+                <b-col cols="2" class="field-blue">&nbsp;</b-col>
+                <b-col cols="4" class="field-red">&nbsp;</b-col>
+            </b-row-->
+            <b-row class="m-0" align-v="center">
+            <b-col cols="3" class="p-0 text-right">
+                <b-dropdown size="sm" :text="product" class="prod-list">
                     <b-dropdown-item  v-for="prod in productList"
                                       :key="prod.id"
                                       @click="changeProduct(prod.id)"
@@ -13,8 +20,9 @@
                     </b-dropdown-item>
                 </b-dropdown>
             </b-col>
-            <b-col v-if="product_id !== 10" cols="4" class="pl-0 pr-0">
-                <b-dropdown size="sm" :text="sMaterial" class="ml-2 mr-2 mt-2 mat-list">
+            <!-- раздел для мерного товара -->
+            <b-col v-if="product_id !== 10" cols="3" class="p-0 pl-1 text-left">
+                <b-dropdown size="sm" :text="sMaterial" class="mat-list">
                     <b-dropdown-item  v-for="mat in materialList"
                                       :key="mat.m"
                                       @click="changeMaterial(mat.m)"
@@ -22,7 +30,7 @@
                         {{ mat.m }}
                     </b-dropdown-item>
                 </b-dropdown>
-                <b-dropdown size="sm" :text="thickness()" class="mr-2 mt-2 p-0">
+                <b-dropdown size="sm" :text="thickness()" class="thck-list">
                     <b-dropdown-item  v-for="thc in tList"
                                       :key="thc.id"
                                       @click="changeMaterialId(thc.id)"
@@ -31,8 +39,8 @@
                     </b-dropdown-item>
                 </b-dropdown>
             </b-col>
-            <b-col v-if="product_id !== 10" cols="3" class="pl-0 pr-2">
-                <b-input-group size="sm" class="mt-2 ml-0" append="мм">
+            <b-col v-if="product_id !== 10" cols="2" class="p-0 pl-1">
+                <b-input-group size="sm" append="мм">
                     <b-form-input  @keypress="onlyNumbers"
                                    @keyup="changeLength"
                                    v-model="cLength"
@@ -41,36 +49,38 @@
                                    class="text-right"/>
                 </b-input-group>
             </b-col>
-            <b-col v-if="product_id !== 10" cols="1" class="mt-2 ml-0 mr-0 pl-0 pt-2 text-right">
-                {{ pLength/1000 + 'м' }}
+            <b-col v-if="product_id !== 10" cols="4" class="p-0 pl-2">
+                /<b>{{ pLength/1000 + 'м' }}</b>
             </b-col>
-            </b-form-row>
+            <!-- раздел для штучного товара -->
+            <b-col v-if="product_id === 10" cols="3" class="p-0 pl-1 text-left">
+                <b-dropdown size="sm" :text="groupName()" class="grp-list">
+                    <b-dropdown-item  v-for="gr in groupsList"
+                                      :key="gr.id"
+                                      @click="changeItemGroup(gr.id)"
+                                      :selected="gr.id === group_id">
+                        {{ gr.groupname }}
+                    </b-dropdown-item>
+                </b-dropdown>
+            </b-col>
+            <b-col v-if="product_id === 10" cols="6" class="p-0 pl-1">
+                <b-dropdown size="sm" :text="itemName()" class="item-list">
+                    <b-dropdown-item  v-for="nm in grItems"
+                                      :key="nm.id"
+                                      @click="changeItem(nm.id)"
+                                      :selected="nm.id === item_id">
+                        {{ nm.itemname }}
+                    </b-dropdown-item>
+                </b-dropdown>
+            </b-col>
+            </b-row>
             </b-container>
-
-            <span v-if="product_id === 10">
-            <select v-model="group_id" v-on:change="changeItemGroup">
-                <option
-                    v-for="gr in groupsList"
-                    :value="gr.id"
-                    :selected="gr.id === group_id"
-                >{{ gr.groupname }}
-                </option>
-            </select>&nbsp;
-            <select v-bind="grItems" v-model="item_id" v-on:change="changeItem">
-                <option
-                    v-for="nm in grItems"
-                    :value="nm.id"
-                    :selected="nm.id === item_id"
-                >{{ nm.itemname }}
-                </option>
-            </select>&nbsp;
-            </span>
         </b-td>
         <b-td>
-            <b-container>
+            <b-container class="p-0 text-left">
             <b-row align-v="center">
-                <b-col cols="8">
-                    <b-input-group size="sm" class="m-2" append="шт">
+                <b-col cols="12" class="pl-5">
+                    <b-input-group size="sm" class="m-0" append="шт">
                         <b-form-input  @keypress="onlyNumbers"
                                        @keyup="changeAmount"
                                        v-model="cAmount"
@@ -80,16 +90,27 @@
                         ></b-form-input>
                     </b-input-group>
                 </b-col>
-                <b-col cols="4">
-                    <b-button variant="danger" :disabled="bt_disabled" size="sm" @click="del" class="ml-0">
-                        <icon name="trash"></icon>
-                    </b-button>
-                </b-col>
             </b-row>
             </b-container>
         </b-td>
-        <!--td colspan="5" v-if="product_id !== 10">{{ pLength/1000 + 'м, ' + sMaterial + ' ' + thickness() + 'мм'}}</td>
-        <td colspan="5" v-if="product_id === 10">{{ group_id + ':' + item_id }}</td-->
+        <b-td>
+            <b-container class="p-0 text-left">
+                <b-row align-v="center" class="p-0 m-0">
+                    <b-col cols="9" class="p-0 text-norm">
+                        <icon name="ruble-sign"/>&nbsp;{{ sum }}
+                    </b-col>
+                    <b-col cols="3" class="text-left p-0">
+                        <b-button variant="danger"
+                                  :disabled="bt_disabled"
+                                  size="sm"
+                                  @click="del"
+                                  class="m-0">
+                            <icon name="trash"/>
+                        </b-button>
+                    </b-col>
+                </b-row>
+            </b-container>
+        </b-td>
     </b-tr>
 </template>
 
@@ -213,14 +234,22 @@ export default {
             this.postData();
         },
 
-        changeItemGroup() {
+        changeItemGroup(newGroupId) {
+            if (newGroupId === this.group_id) {
+                return
+            }
+            console.log()
+            this.group_id = newGroupId
             this.grItems = this.nomList()
-            this.item_id = this.grItems[0].id
-            this.changeItem();
+            this.changeItem(this.grItems[0].id)
         },
 
-        changeItem() {
-            this.postData();
+        changeItem(newItemId) {
+            if (newItemId === this.item_id) {
+                return
+            }
+            this.item_id = newItemId
+            this.postData()
         },
 
         changeLength() {
@@ -252,6 +281,16 @@ export default {
                 return this.parent.materials[id].material;
             }
             else { return ""; }
+        },
+
+        //возвращает название группы штучного товара
+        groupName(){
+            return this.parent.n_groups[this.group_id].groupname;
+        },
+
+        //возвращает название выбранного штучного товара
+        itemName(){
+            return this.parent.nom[this.item_id].itemname;
         },
 
         //Возвращает наименование толщины материала в текстовом виде
@@ -336,7 +375,7 @@ export default {
     },
 
 	sum: function() {
-	    return this.amount * this.price;
+	    return this.pAmount * this.price;
 	}
     }, // конец раздела computed
 
