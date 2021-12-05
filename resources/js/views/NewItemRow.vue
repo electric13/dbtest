@@ -4,7 +4,10 @@
             <b-container class="p-0 text-left">
                 <b-row class="m-0" align-v="center">
                     <b-col cols="3" class="p-0 text-right">
-                        <b-dropdown size="sm" :text="product" class="prod-list">
+                        <b-dropdown size="sm"
+                                    :text="product"
+                                    class="prod-list"
+                                    variant="outline-dark">
                             <b-dropdown-item  v-for="prod in productList"
                                               :key="prod.id"
                                               @click="changeProduct(prod.id)"
@@ -15,7 +18,7 @@
                     </b-col>
                     <!-- раздел для мерного товара -->
                     <b-col v-if="product_id !== 10" cols="3" class="p-0 pl-1 text-left">
-                        <b-dropdown size="sm" :text="sMaterial" class="mat-list">
+                        <b-dropdown size="sm" :text="sMaterial" class="mat-list" variant="outline-dark">
                             <b-dropdown-item  v-for="mat in materialList"
                                               :key="mat.m"
                                               @click="changeMaterial(mat.m)"
@@ -23,7 +26,7 @@
                                 {{ mat.m }}
                             </b-dropdown-item>
                         </b-dropdown>
-                        <b-dropdown size="sm" :text="thickness" class="thck-list">
+                        <b-dropdown size="sm" :text="thickness" class="thck-list" variant="outline-dark">
                             <b-dropdown-item  v-for="thc in tList"
                                               :key="thc.id"
                                               @click="changeMaterialId(thc.id)"

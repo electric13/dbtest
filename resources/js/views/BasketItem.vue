@@ -11,7 +11,10 @@
             </b-row-->
             <b-row class="m-0" align-v="center">
             <b-col cols="3" class="p-0 text-right">
-                <b-dropdown size="sm" :text="product" class="prod-list">
+                <b-dropdown size="sm"
+                            :text="product"
+                            class="prod-list"
+                            :variant="product_id===10?'outline-secondary':'outline-dark'" >
                     <b-dropdown-item  v-for="prod in productList"
                                       :key="prod.id"
                                       @click="changeProduct(prod.id)"
@@ -22,7 +25,10 @@
             </b-col>
             <!-- раздел для мерного товара -->
             <b-col v-if="product_id !== 10" cols="3" class="p-0 pl-1 text-left">
-                <b-dropdown size="sm" :text="sMaterial" class="mat-list">
+                <b-dropdown size="sm"
+                            :text="sMaterial"
+                            class="mat-list"
+                            variant="outline-dark" >
                     <b-dropdown-item  v-for="mat in materialList"
                                       :key="mat.m"
                                       @click="changeMaterial(mat.m)"
@@ -30,7 +36,10 @@
                         {{ mat.m }}
                     </b-dropdown-item>
                 </b-dropdown>
-                <b-dropdown size="sm" :text="thickness()" class="thck-list">
+                <b-dropdown size="sm"
+                            :text="thickness()"
+                            class="thck-list"
+                            variant="outline-dark">
                     <b-dropdown-item  v-for="thc in tList"
                                       :key="thc.id"
                                       @click="changeMaterialId(thc.id)"
@@ -49,12 +58,18 @@
                                    class="text-right"/>
                 </b-input-group>
             </b-col>
-            <b-col v-if="product_id !== 10" cols="4" class="p-0 pl-2">
+            <b-col v-if="product_id !== 10" cols="2" class="p-0 pl-2">
                 /<b>{{ pLength/1000 + 'м' }}</b>
+            </b-col>
+            <b-col v-if="product_id !== 10" cols="1" class="p-0">
+                <div class="ral9003 border border-dark">&nbsp</div>
             </b-col>
             <!-- раздел для штучного товара -->
             <b-col v-if="product_id === 10" cols="3" class="p-0 pl-1 text-left">
-                <b-dropdown size="sm" :text="groupName()" class="grp-list">
+                <b-dropdown size="sm"
+                            :text="groupName()"
+                            class="grp-list"
+                            variant="outline-secondary">
                     <b-dropdown-item  v-for="gr in groupsList"
                                       :key="gr.id"
                                       @click="changeItemGroup(gr.id)"
@@ -64,8 +79,11 @@
                 </b-dropdown>
             </b-col>
             <b-col v-if="product_id === 10" cols="6" class="p-0 pl-1">
-                <b-dropdown size="sm" :text="itemName()" class="item-list">
-                    <b-dropdown-item  v-for="nm in grItems"
+                <b-dropdown size="sm"
+                            :text="itemName()"
+                            class="item-list"
+                            variant="outline-secondary">
+                <b-dropdown-item  v-for="nm in grItems"
                                       :key="nm.id"
                                       @click="changeItem(nm.id)"
                                       :selected="nm.id === item_id">

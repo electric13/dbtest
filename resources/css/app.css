@@ -3,15 +3,15 @@
 }
 
 .mat-list {
-    width: 96px;
+    width: 94px;
 }
 
 .grp-list {
-    width: 170px;
+    width: 166px;
 }
 
 .thck-list {
-    width: 70px;
+    width: 68px;
 }
 
 .item-list {
@@ -24,6 +24,10 @@
 
 .text-norm{
     font-size: 1rem;
+}
+
+.ral9003 {
+    background: #f7fafc;
 }
 
 .field-red {

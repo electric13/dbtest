@@ -25,8 +25,14 @@ class APIBasketController extends Controller
         if (! $b) {
             return ['NoBasketYet' => true];
         } else {
+            // отдельный список для штучного товара
             return new BasketItemCollection(
-                BasketItem::where('basket_id', $b->id)->orderBy('id')->get());
+                // объединяем мерный товар со штучным
+                BasketItem::where('basket_id', $b->id)
+                          ->orderBy('product_id')
+                          ->orderBy('material_id')
+                          ->orderBy('id')
+                          ->get());
         }
     }
 
@@ -43,13 +49,24 @@ class APIBasketController extends Controller
 
     public function apiAdd(BasketItemRequest $request){
         $basket_id = $this->getBasket($request->request->get('key'));
+        $p_id = $request->request->getInt('product');
+        if ($p_id != 10) {
+            $m_id = $request->request->getInt('material');
+            $i_id = 0;
+            $lng = $request->request->getInt('length');
+        } else {
+            $m_id = 0;
+            $lng = 0;
+            $i_id = $request->request->getInt('item');
+        }
+
         $item = BasketItem::create(
             [
                 'basket_id' => $basket_id,
-                'material_id' => $request->request->getInt('material'),
-                'product_id' => $request->request->getInt('product'),
-                'item_id' => $request->request->getInt('item'),
-                'length' => $request->request->getInt('length'),
+                'product_id' => $p_id,
+                'material_id' => $m_id,
+                'item_id' => $i_id,
+                'length' => $lng,
                 'amount' => $request->request->getInt('amount')
             ]);
 

@@ -70,9 +70,21 @@ export default {
           }
           if ( qN > 0 && ! this.needUpd) {
               //обновлений не было, можно обрабатывать
-              console.log('Запросов в очереди '+ this.requests.length)
               let req = this.requests.pop()
-              console.log(req.request)
+              console.log('Обновление...')
+              if (req.command === 'update') {
+                  axios.post(req.url, req.request, {})
+                       .then(() => {
+                           // успешно обновили
+                           let id = this.items.findIndex( x => x.id === req.id )
+                           if ( typeof id != 'undefined') {
+                               //что-то сделать с элементом
+                           }
+                       })
+                       .catch(() => {
+                           console.log('Произошла ошибка при обновлении элемента корзины')
+                       })
+              }
           }
           // и засыпаем
           setTimeout(this.timerHandler, 2500);
