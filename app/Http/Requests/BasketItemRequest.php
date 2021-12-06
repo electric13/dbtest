@@ -44,10 +44,12 @@ class BasketItemRequest extends FormRequest
 
     public function rules()
     {
-        if ($this->is('api/basket/add')) {
+        if ( $this->is('api/basket/add') ||
+             $this->is('api/basket/price') ) {
             // для добавления элемента корзина может еще не быть создана,
             // но уникальный номер сессии должен быть обязательно сгенерирован
-            $rules = $this->rulesAdd();
+            $rules = ['key' => 'required|string'] + $this->rulesAdd();
+
         } else {
             $rules = ['key' => 'required|string|exists:baskets,session_id'];
         }

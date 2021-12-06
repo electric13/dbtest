@@ -23,6 +23,7 @@ Route::post('basket/clear',   [APIBasketController::class, 'apiClear']);
 Route::post('basket/add',     [APIBasketController::class, 'apiAdd']);
 Route::post('basket/del',     [APIBasketController::class, 'apiDel']);
 Route::post('basket/update',  [APIBasketController::class, 'apiUpd']);
+Route::post('basket/price',   [APIBasketController::class, 'apiReqPrice']);
 
 
 Route::get('materials',    [APIRefDataController::class, 'apiMatIndex']);

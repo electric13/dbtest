@@ -50,7 +50,10 @@
                     </b-col>
                     <!-- раздел для штучного товара -->
                     <b-col v-if="product_id === 10" cols="3" class="p-0 pl-1 text-left">
-                        <b-dropdown size="sm" :text="groupName()" class="grp-list">
+                        <b-dropdown size="sm"
+                                    :text="groupName"
+                                    class="grp-list"
+                                    variant="outline-secondary">
                             <b-dropdown-item  v-for="gr in groupsList"
                                               :key="gr.id"
                                               @click="changeItemGroup(gr.id)"
@@ -60,7 +63,10 @@
                         </b-dropdown>
                     </b-col>
                     <b-col v-if="product_id === 10" cols="6" class="p-0 pl-1">
-                        <b-dropdown size="sm" :text="itemName()" class="item-list">
+                        <b-dropdown size="sm"
+                                    :text="itemName"
+                                    class="item-list"
+                                    variant="outline-secondary">
                             <b-dropdown-item  v-for="nm in grItems"
                                               :key="nm.id"
                                               @click="changeItem(nm.id)"
@@ -112,10 +118,12 @@
 
 <script>
 
+
 export default {
     name: "NewItemRow",
     props: [
-        'parent'
+        'parent',
+        'price'
     ],
 
     data() {
@@ -158,7 +166,14 @@ export default {
         },
 
         postRequestInQueue( reqObj ){
-            this.parent.requests.push( reqObj )
+            let i = this.parent.requests.findIndex(x => x.command === 'price')
+            if (i < 0) {
+                // если нет запросов - то помещаем в список новый
+                this.parent.requests.push( reqObj )
+            } else {
+                // если уже есть - перезаписываем
+                this.parent.requests[i] = reqObj
+            }
         },
 
         //Возвращает массив возможных толщин для текущего материала
@@ -173,7 +188,6 @@ export default {
         },
 
         checkDirty(){
-            console.log(this.cAmount+' '+this.pAmount+' '+this.cLength +' '+this.pLength)
             if (this.cAmount !== this.pAmount) {
                 this.cAmount = this.pAmount;
             }
@@ -203,11 +217,10 @@ export default {
                 // из списка материалов.
                 this.material_id = this.parent.materials[0].id;
                 this.sMaterial = this.parent.materials[0].material;
-                console.log(this.material_id+ ':' + this.sMaterial)
                 this.tList = this.thicknessList();
                 this.cLength = this.pLength = 1000;
             }
-            //this.requestPrice()
+            this.requestPrice()
         },
 
         changeMaterial(newMaterial) {
@@ -226,7 +239,7 @@ export default {
                 this.material_id = this.tList[0].id
                 this.sThickness =  this.tList[0].thickness
             }
-            //this.requestPrice();
+            this.requestPrice();
         },
 
         changeMaterialId(newMaterialId) {
@@ -241,14 +254,13 @@ export default {
             } else {
                 this.sThickness = 0
             }
-            //this.requestPrice();
+            this.requestPrice();
         },
 
         changeItemGroup(newGroupId) {
             if (newGroupId === this.group_id) {
                 return
             }
-            console.log()
             this.group_id = newGroupId
             this.grItems = this.nomList()
             this.changeItem(this.grItems[0].id)
@@ -259,14 +271,14 @@ export default {
                 return
             }
             this.item_id = newItemId
-            //this.requestPrice()
+            this.requestPrice()
         },
 
         changeLength() {
             this.cLength = Number(this.cLength);
             if ( this.cLength >= 200 && this.cLength <= 8000 && this.pLength !== this.cLength) {
                 this.pLength = this.cLength;
-                //this.requestPrice();
+                this.requestPrice();
             }
         },
 
@@ -274,7 +286,7 @@ export default {
             this.cAmount = Number(this.cAmount);
             if ( this.cAmount > 0 && this.cAmount <= 99000 && this.pAmount !== this.cAmount) {
                 this.pAmount = this.cAmount;
-                //this.requestPrice();
+                this.requestPrice();
             }
         },
 
@@ -282,6 +294,33 @@ export default {
             if (! this.digits.has(event.key)) {
                 event.preventDefault();
             }
+        },
+
+        //возвращает массив товаров для текущей группы
+        nomList(){
+            let currGroup = this.group_id;
+            return this.parent.nom.filter( item => item.group_id === currGroup );
+        },
+
+        //Запрос цены
+        requestPrice(){
+
+            let req = {
+                "key": this.parent.basketID,
+                "material": this.material_id,
+                "product": this.product_id,
+                "amount": this.pAmount,
+                "item": this.item_id,
+                "length": this.pLength
+            }
+
+            let qItem = {
+                "id"     : 0,
+                "request": req,
+                "url"    : "/api/basket/price",
+                "command": "price"
+            }
+            this.postRequestInQueue(qItem)
         },
     },
 
@@ -310,6 +349,11 @@ export default {
             return this.parent.n_groups.filter( () => true );
         },
 
+        //возвращает название группы штучного товара
+        groupName(){
+            return this.parent.n_groups[this.group_id].groupname;
+        },
+
         nom() {
             if (typeof this.parent == "undefined") {
                 return ""
@@ -322,10 +366,6 @@ export default {
                 return this.parent
             }
             return this.parent.products;
-        },
-        //возвращает название группы штучного товара
-        groupName(){
-            return this.parent.n_groups[this.group_id].groupname;
         },
 
         //возвращает название выбранного штучного товара
@@ -341,12 +381,6 @@ export default {
             } else {
                 return "";
             }
-        },
-
-        //возвращает массив товаров для текущей группы
-        nomList: function(){
-            let currGroup = this.group_id;
-            return this.parent.nom.filter( item => item.group_id === currGroup );
         },
 
         sum() {
@@ -368,6 +402,7 @@ export default {
         this.sMaterial = this.parent.materials[0].material
         this.sThickness = this.parent.materials[0].thickness
         this.tList = this.thicknessList()
+        this.requestPrice()
     }
 
 }

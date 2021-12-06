@@ -25,9 +25,7 @@ class APIBasketController extends Controller
         if (! $b) {
             return ['NoBasketYet' => true];
         } else {
-            // отдельный список для штучного товара
             return new BasketItemCollection(
-                // объединяем мерный товар со штучным
                 BasketItem::where('basket_id', $b->id)
                           ->orderBy('product_id')
                           ->orderBy('material_id')
@@ -103,7 +101,7 @@ class APIBasketController extends Controller
         return new BasketItemCollection(
             BasketItem::where('basket_id', $basket_id)
                       ->where('id', $id)
-                      ->orderBy('id')->get());
+                      ->get());
     }
 
 
@@ -118,4 +116,25 @@ class APIBasketController extends Controller
                   ->delete();
         return ['Deleted' => $request->request->getInt('id')];
     }
+
+    public function apiReqPrice(BasketItemRequest $request){
+        // ЗАГЛУШКА!!!
+        $b = $this->getBasket($request->request->get('key'));
+        if ($request->request->getInt('product') == 10) {
+            $price = 77;
+        } else {
+            $price = 129 * $request->request->getInt('length') / 1000;
+        }
+        return [
+            [ 'material' => $request->request->getInt('material'),
+              'product' => $request->request->getInt('product'),
+              'item' => $request->request->getInt('item'),
+              'length' => $request->request->getInt('length'),
+              'amount' => $request->request->getInt('amount'),
+              'price' => $price
+            ]
+        ];
+
+    }
+
 }

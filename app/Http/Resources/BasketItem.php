@@ -20,7 +20,8 @@ class BasketItem extends JsonResource
             'product' => $this->product_id,
             'item' => $this->item_id,
             'length' => $this->length,
-            'amount' => $this->amount
+            'amount' => $this->amount,
+            'price' => $this->product_id === 10 ? 125 : (125 * $this->length / 1000)
         ];
     }
 }

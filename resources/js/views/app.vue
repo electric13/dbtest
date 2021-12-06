@@ -1,5 +1,5 @@
 <template>
-  <div class="row" @upd-item="updItem" @add-item="addItem">
+  <div class="row m-0" @upd-item="updItem" @add-item="addItem">
       <div class="col-10 mx-auto">
       <b-table-simple hover small caption-top responsive d-flex bordered>
           <b-thead head-variant="dark">
@@ -71,20 +71,33 @@ export default {
           if ( qN > 0 && ! this.needUpd) {
               //обновлений не было, можно обрабатывать
               let req = this.requests.pop()
-              console.log('Обновление...')
               if (req.command === 'update') {
                   axios.post(req.url, req.request, {})
-                       .then(() => {
+                       .then(response => {
                            // успешно обновили
                            let id = this.items.findIndex( x => x.id === req.id )
                            if ( typeof id != 'undefined') {
-                               //что-то сделать с элементом
+                               // передаем вновь полученную цену
+                               this.items[id].price = response.data.data[0].price
                            }
                        })
-                       .catch(() => {
+                       .catch(error => {
                            console.log('Произошла ошибка при обновлении элемента корзины')
+                           console.log(error)
                        })
               }
+              if (req.command === 'price') {
+                  axios.post(req.url, req.request, {})
+                      .then(response => {
+                          // успешно обновили
+                          this.adder.price = response.data[0].price
+                      })
+                      .catch(error => {
+                          console.log('Произошла ошибка при запросе цены')
+                          console.log(error)
+                      })
+              }
+
           }
           // и засыпаем
           setTimeout(this.timerHandler, 2500);
@@ -92,7 +105,6 @@ export default {
 
       reload() {
           // перезагрузка данных при добавлении нового товара
-          console.log('Добавлено');
           this.items = [];
           this.adder = { 'parent': this }
           this.read();
@@ -181,9 +193,9 @@ export default {
                                                      i.item,
                                                      i.amount,
                                                      i.length,
-                                                     125))
+                                                     i.price))
               }
-              this.adder = { 'parent': this }
+              this.adder = { 'parent': this, 'price': 0 }
               this.dataLoaded = true
           })
       },

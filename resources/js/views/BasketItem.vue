@@ -181,7 +181,6 @@ export default {
         },
 
         checkDirty(){
-            console.log(this.cAmount+' '+this.pAmount+' '+this.cLength +' '+this.pLength)
             if (this.cAmount !== this.pAmount) {
                 this.cAmount = this.pAmount;
             }
@@ -211,7 +210,6 @@ export default {
                 // из списка материалов.
                 this.material_id = this.parent.materials[0].id;
                 this.sMaterial = this.material();
-                console.log(this.material_id+ ':' + this.sMaterial)
                 this.tList = this.thicknessList();
                 this.cLength = this.pLength = 1000;
             }
@@ -256,7 +254,6 @@ export default {
             if (newGroupId === this.group_id) {
                 return
             }
-            console.log()
             this.group_id = newGroupId
             this.grItems = this.nomList()
             this.changeItem(this.grItems[0].id)
