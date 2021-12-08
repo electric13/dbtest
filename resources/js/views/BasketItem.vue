@@ -62,7 +62,7 @@
                 /<b>{{ pLength/1000 + 'м' }}</b>
             </b-col>
             <b-col v-if="product_id !== 10" cols="1" class="p-0">
-                <div class="ral9003 border border-dark">&nbsp</div>
+                <div class="border border-dark" v-bind:style="getMatColor">&nbsp</div>
             </b-col>
             <!-- раздел для штучного товара -->
             <b-col v-if="product_id === 10" cols="3" class="p-0 pl-1 text-left">
@@ -298,6 +298,15 @@ export default {
             else { return ""; }
         },
 
+        // возвращает текущий материал из справочника в виде объекта
+        getCurrentMaterial() {
+            let id = this.parent.materials.findIndex(x => x.id === this.material_id);
+            if (id >= 0) {
+                return this.parent.materials[id];
+            }
+            else { return {}; }
+        },
+
         //возвращает название группы штучного товара
         groupName(){
             return this.parent.n_groups[this.group_id].groupname;
@@ -391,7 +400,17 @@ export default {
 
 	sum: function() {
 	    return this.pAmount * this.price;
-	}
+	},
+
+    getMatColor() {
+        let m = this.getCurrentMaterial();
+        if (typeof m.color != 'undefined') {
+            return {
+                     background: m.color
+                   }
+        } else return '';
+    }
+
     }, // конец раздела computed
 
     created() {

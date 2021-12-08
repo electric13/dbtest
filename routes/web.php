@@ -1,8 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use \App\Http\Controllers\MainController;
-use \App\Http\Controllers\AddItemController;
+use App\Http\Controllers\LoginController;
+use App\Http\Controllers\MainController;
+use App\Http\Controllers\AddItemController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -13,6 +14,9 @@ use \App\Http\Controllers\AddItemController;
 | contains the "web" middleware group. Now create something great!
 |
 */
+
+
+Route::get('/login',       [LoginController::class, 'authenticate']);
 
 Route::get('/order/{id}',  [MainController::class, 'order']);
 Route::get('/vue',  [MainController::class, 'vueTest']);

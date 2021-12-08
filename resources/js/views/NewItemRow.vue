@@ -141,7 +141,8 @@ export default {
             'cLength':      0,  //текущая длина в поле ввода
             'pAmount':      0,  //ранее сохраненное корректное количество
             'pLength':      0,  //ранее сохраненная корректная длина
-            'digits':       {}
+            'digits':       {},
+            'lPrice':       0   // локально сохраненная цена
         }
     },
 
@@ -384,10 +385,12 @@ export default {
         },
 
         sum() {
-            if (typeof this.parent == "undefined") {
-                return 0
+            if (this.price > 0) {
+                this.lPrice = this.price
+            } else {
+                this.requestPrice()
             }
-            return this.pAmount * this.price;
+            return this.pAmount * this.lPrice;
         }
     }, // конец раздела computed
 

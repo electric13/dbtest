@@ -1,7 +1,7 @@
 <template>
-  <div class="row m-0" @upd-item="updItem" @add-item="addItem">
-      <div class="col-10 mx-auto">
-      <b-table-simple hover small caption-top responsive d-flex bordered>
+  <div class="row m-0">
+      <b-col cols="11" class="mx-auto">
+      <b-table-simple hover small caption-top responsive d-flex bordered class="full-screen">
           <b-thead head-variant="dark">
               <b-tr>
                   <b-th class="col-8">Наименование</b-th>
@@ -21,7 +21,7 @@
                             @add-item="reload"/>
           </b-tbody>
       </b-table-simple>
-      </div>
+      </b-col>
   </div>
 </template>
 
@@ -105,9 +105,7 @@ export default {
 
       reload() {
           // перезагрузка данных при добавлении нового товара
-          this.items = [];
-          this.adder = { 'parent': this }
-          this.read();
+          this.read()
       },
 
       read() {
@@ -180,42 +178,53 @@ export default {
               let req = { "key": this.basketID }
               promises.push(axios.post('/api/basket', req, {})
                   .then(response => {
-                      tmp = response.data.data;
+                      tmp = response.data.data
                   }));
           }
 
-
           Promise.all(promises).then( () => {
-              for (let i of tmp) {
-                  this.items.push(new BaskItem(this, i.id,
-                                                     i.material,
-                                                     i.product,
-                                                     i.item,
-                                                     i.amount,
-                                                     i.length,
-                                                     i.price))
+              if (this.items.length > 0 && tmp.length > 0) {
+                  // необходимо поместить в локальную корзину элементы, которые отсутствуют,
+                  // но есть в серверной корзине (только что добавленные)
+                  for (let i = 0; i < tmp.length; i++) {
+                      tmp[i].position = i;
+                  }
+                  for (let i of this.items) {
+                      let a = tmp.findIndex(x => x.id === i.id)
+                      if (a >= 0) { tmp.splice(a, 1) }
+                  }
+                  if (tmp.length > 0) {
+                      for (let i of tmp) {
+                          this.items.splice( i.position, 0,  new BaskItem(this, i.id,
+                                                                            i.material,
+                                                                            i.product,
+                                                                            i.item,
+                                                                            i.amount,
+                                                                            i.length,
+                                                                            i.price))
+                      }
+                  }
+              } else {
+                  for (let i of tmp) {
+                      this.items.push(new BaskItem(this, i.id,
+                          i.material,
+                          i.product,
+                          i.item,
+                          i.amount,
+                          i.length,
+                          i.price))
+                  }
+                  this.adder = { 'parent': this, 'price': 0 }
               }
-              this.adder = { 'parent': this, 'price': 0 }
               this.dataLoaded = true
           })
       },
 
-      addItem() {
-          // Добавление в корзину должно быть в отдельном компоненте
-          this.items.push(new BaskItem(this, 10, 6, 5, 7, 1440, 23.0));
-      },
-
-      async updItem(id) {
-          // тоже хз зачем это, каждый компонент обновляется сам. Возможно, надо сделать очередь
-          // куда складывать все обновление, и централизованно обновлять.
-          console.log('app need to update line ' + id);
-      },
-
-      async delItem(id) {
+      delItem(id) {
           let f_id = this.items.findIndex(x => x.id === id);
           if (f_id >= 0) {
               let req = { "key": this.basketID, "id": id }
-              axios.post('/api/basket/del', req, {})
+              axios.post('/api/basket/delete', req, {})
                    .then(() => { this.items.splice(f_id, 1); })
                    .catch(err => alert(err));
           }

@@ -23,7 +23,7 @@ class APIBasketController extends Controller
         $session_id = $request->request->get('key');
         $b = Basket::where('session_id', '=', $session_id)->first();
         if (! $b) {
-            return ['NoBasketYet' => true];
+            return ['data' => []];
         } else {
             return new BasketItemCollection(
                 BasketItem::where('basket_id', $b->id)

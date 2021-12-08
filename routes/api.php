@@ -21,7 +21,7 @@ Route::get('register',     [APIRegistrator::class, 'getKey']);
 Route::post('basket',         [APIBasketController::class, 'apiIndex']);
 Route::post('basket/clear',   [APIBasketController::class, 'apiClear']);
 Route::post('basket/add',     [APIBasketController::class, 'apiAdd']);
-Route::post('basket/del',     [APIBasketController::class, 'apiDel']);
+Route::post('basket/delete',     [APIBasketController::class, 'apiDel']);
 Route::post('basket/update',  [APIBasketController::class, 'apiUpd']);
 Route::post('basket/price',   [APIBasketController::class, 'apiReqPrice']);
 

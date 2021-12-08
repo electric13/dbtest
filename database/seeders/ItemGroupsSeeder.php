@@ -22,7 +22,7 @@ class ItemGroupsSeeder extends Seeder
             ['id' => 1, 'groupname' => 'Коньки', 'colored' => true],
             ['id' => 2, 'groupname' => 'Торцевые планки', 'colored' => true],
             ['id' => 3, 'groupname' => 'Кровельные саморезы', 'colored' => true],
-            ['id' => 5, 'groupname' => 'Профтруба', 'colored' => false]
+            ['id' => 4, 'groupname' => 'Профтруба', 'colored' => false]
         ];
         foreach ($it_groups as $it_group) { ItemGroup::create($it_group); }
     }
