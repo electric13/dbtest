@@ -16,12 +16,12 @@ use App\Http\Controllers\AddItemController;
 */
 
 
-Route::get('/login',       [LoginController::class, 'authenticate']);
-Route::get('/logout',      [LoginController::class, 'logout']);
+Route::get('/login',        [LoginController::class, 'authenticate']);
+Route::get('/logout',       [LoginController::class, 'logout']);
 
-Route::get('/order/{id}',  [MainController::class, 'order']);
+Route::get('/order/{id}',   [MainController::class, 'order']);
 
-Route::get('/vue',  [MainController::class, 'vueTest']);
+Route::get('/vue',          [MainController::class, 'vueTest']);
 
 Route::get('/basket',       [MainController::class, 'showBasket']);
 
@@ -30,5 +30,5 @@ Route::get('/basket/clear', [AddItemController::class, 'clear']);
 Route::post('/basket/del',  [AddItemController::class, 'delete']);
 
 Route::get('/', function () {
-    return view('welcome'); //, ['contacts'=> $contacts]);
-});
+        return view('welcome');
+       });

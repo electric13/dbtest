@@ -1,7 +1,7 @@
 <template>
   <div class="row m-0">
       <b-col cols="11" class="mx-auto">
-      <b-table-simple hover small caption-top responsive d-flex bordered class="full-screen">
+      <b-table-simple hover small caption-top responsive d-flex bordered class="basket">
           <b-thead head-variant="dark">
               <b-tr>
                   <b-th class="col-8">Наименование</b-th>
@@ -168,19 +168,29 @@ export default {
           }
 
           //ищем ключ с прошлого сеанса, если нет - генерируем новый.
-          if ( localStorage.getItem('session_id') == null) {
-              promises.push(axios.get('/api/register').then(response => {
-                  this.basketID = response.data.key;
-                  localStorage.setItem('session_id', this.basketID);
-              }));
+          console.log('key test')
+          let key = document.querySelector('meta[name="api-token"]').content
+          if (typeof key == 'undefined' || key.length == 0) {
+              //не залогинились, надо поискать в хранилище старый ключ
+              if ( localStorage.getItem('session_id') == null) {
+                  // ключа нет, запрашиваем новый!
+                  promises.push(axios.get('/api/register').then(response => {
+                      this.basketID = response.data.key
+                      localStorage.setItem('session_id', this.basketID)
+                  }))
+              } else {
+                  //ключ есть в хранилише!
+                  this.basketID = localStorage.getItem('session_id')
+              }
           } else {
-              this.basketID = localStorage.getItem('session_id');
-              let req = { "key": this.basketID }
-              promises.push(axios.post('/api/basket', req, {})
+              // залогинены, ключ из ответа сервера
+              this.basketID = key
+          }
+          let req = { "key": this.basketID }
+          promises.push(axios.post('/api/basket', req, {})
                   .then(response => {
                       tmp = response.data.data
                   }));
-          }
 
           Promise.all(promises).then( () => {
               if (this.items.length > 0 && tmp.length > 0) {

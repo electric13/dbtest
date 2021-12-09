@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="api-token" content="{{ auth()->check() ? auth()->user()->api_token : "" }}">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@200;600&display=swap" rel="stylesheet">
     <script src="https://www.google.com/recaptcha/api.js?onload=vueRecaptchaApiLoaded&render=explicit" async defer>
@@ -12,7 +13,7 @@
 </head>
 <body>
 <div>
-    <p>Logged as {{ Auth::user() ? Auth::user()->name : 'Anonymous' }}</p>
+    <p>Logged as {{ auth()->check() ? auth()->user()->name : 'Anonymous' }}</p>
 </div>
 <div id="app">
     <app></app>
