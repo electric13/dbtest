@@ -8,10 +8,12 @@
     <script src="https://www.google.com/recaptcha/api.js?onload=vueRecaptchaApiLoaded&render=explicit" async defer>
     </script>
     <link rel="stylesheet" href="{{ mix('css/app.css') }}" />
-
     <title>{{env('APP_NAME')}}</title>
 </head>
 <body>
+<div>
+    <p>Logged as {{ Auth::user() ? Auth::user()->name : 'Anonymous' }}</p>
+</div>
 <div id="app">
     <app></app>
 </div>

@@ -17,8 +17,10 @@ use App\Http\Controllers\AddItemController;
 
 
 Route::get('/login',       [LoginController::class, 'authenticate']);
+Route::get('/logout',      [LoginController::class, 'logout']);
 
 Route::get('/order/{id}',  [MainController::class, 'order']);
+
 Route::get('/vue',  [MainController::class, 'vueTest']);
 
 Route::get('/basket',       [MainController::class, 'showBasket']);
